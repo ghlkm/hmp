@@ -44,11 +44,12 @@ public:
         // begin to generate children
         if(cur_level<tar_level){
             if(dim>=3){
-                std::vector<double> tmp(dim);
+                std::vector<double> tmp(2*dim);
                 for (int i = 0; i < dim; ++i) {
-                    tmp[i]=b[i*2];
+                    tmp[i*2]=b[i*2];
+                    tmp[i*2+1]=b[i*2];
                 }
-                this->children.push_back(new cell(tmp, cur_level+1, card, k, tar_level));
+                this->children.push_back(new cell(tmp, cur_level+1, tar_level, card, k));
             }
             for (int d = 0; d <dim ; ++d) {
                 std::vector<double> tmp;
@@ -62,7 +63,7 @@ public:
                         tmp.push_back((l+u)/2.0);
                     }
                 }
-                this->children.push_back(new cell(tmp, cur_level+1, card, k, tar_level));
+                this->children.push_back(new cell(tmp, cur_level+1, tar_level, card, k));
             }
         }
     }
@@ -109,14 +110,6 @@ public:
 };
 
 
-void get_all_leaves(cell &node, std::vector<cell*>& ret){
-    if(node.children.empty()){
-        ret.push_back(&node);
-    }else{
-        for(auto &child: node.children){
-            get_all_leaves(*child, ret);
-        }
-    }
-}
+void get_all_leaves(cell &node, std::vector<cell*>& ret);
 
 #endif //HEATMAP_CELL_H

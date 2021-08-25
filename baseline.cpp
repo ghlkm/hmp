@@ -15,7 +15,7 @@
  * 3.         b=[]
  * 4.         for d in range(dim):
  * 5.             l=parent.bounds[d*2], u=parent.bounds[d*2+1]
- * 6.             b.add(l)
+ * 6.             b.add(l), b.add(l)
  * 7.         parent.children.add(cell(b))
  * 8.     for d in range(dim): # if dim<3, there are dim children nodes
  * 9.         b=[]

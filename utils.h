@@ -12,32 +12,15 @@
 #define DOMINATED -1
 #define NONDO 0
 
-int r_dominate(std::vector<std::vector<double>> &vs, std::vector<double> &p1, std::vector<double> &p2){
-    int ret=NONDO;
-    double p1s, p2s;
-    for (auto &v: vs) {
-        p1s=p1*v;
-        p2s=p2*v;
-        if(p1s>p2s){
-            if(ret==DOMINATED){
-                return NONDO;
-            }else{
-                ret=DOMINATE;
-            }
-        }else if(p1s<p2s){
-            if(ret==DOMINATE){
-                return NONDO;
-            }else{
-                ret=DOMINATED;
-            }
-        }
-    }
-    return ret;
-}
+int r_dominate(std::vector<std::vector<double>> &vs, std::vector<double> &p1, std::vector<double> &p2);
 
 void helpmsg(const char* pgm);
 
 const char* read(int a_argc, const char** a_argv, const char* a_param, const char* a_def);
 
+vector<vector<double>> read_options(const char* datafile, int dim);
 
+inline bool v1_dominate_v2(vector<double>& v1, vector<double>& v2);
+
+void kskyband_nortree(vector<int> &ret, vector<vector<double>> &data,int k);
 #endif //HEATMAP_UTILS_H
