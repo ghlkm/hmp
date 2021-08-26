@@ -3,4 +3,4 @@ project(heatmap)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(heatmap main.cpp gen_data.cpp gen_data.h baseline.cpp baseline.h cell.cpp cell.h CSA.cpp CSA.h utils.cpp utils.h)
+add_executable(heatmap main.cpp cell.cpp cell.h hmp.cpp hmp.h utils.cpp utils.h vector_operator.h)

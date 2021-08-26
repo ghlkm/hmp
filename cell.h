@@ -9,7 +9,12 @@
 #include <vector>
 #include <string>
 #include "utils.h"
+#include <unordered_set>
 
+#define mCSA  1
+#define mCSAp 2
+#define mMDA  3
+#define mHMDA 4
 
 class cell{
 public:
@@ -24,7 +29,9 @@ public:
     double rHeat; // No. of RSK
     double dHeat; // No. of r-dominate relationships
 
-    cell(std::vector<double> &b, int cur_level, int tar_level, int card, int K, std::string &m= (std::string &) "MDA"){
+    vector<unordered_set<int>> rdo_graph; // only used for CSA+, a "dominate" graph
+
+    cell(std::vector<double> &b, int cur_level, int tar_level, int card, int K, int m=mHMDA){
         /*
          * \para b, bounds
          * \para cur_level, this cell would be in which level of the quad-tree
@@ -49,7 +56,7 @@ public:
                     tmp[i*2]=b[i*2];
                     tmp[i*2+1]=b[i*2];
                 }
-                this->children.push_back(new cell(tmp, cur_level+1, tar_level, card, k));
+                this->children.push_back(new cell(tmp, cur_level+1, tar_level, card, k, m));
             }
             for (int d = 0; d <dim ; ++d) {
                 std::vector<double> tmp;
@@ -63,8 +70,11 @@ public:
                         tmp.push_back((l+u)/2.0);
                     }
                 }
-                this->children.push_back(new cell(tmp, cur_level+1, tar_level, card, k));
+                this->children.push_back(new cell(tmp, cur_level+1, tar_level, card, k, m));
             }
+        }
+        if(m==mCSAp){
+            this->rdo_graph=vector<unordered_set<int>>(card);
         }
     }
 
@@ -103,6 +113,46 @@ public:
             for(auto &child: this->children){
                 child->recursively_update_dmc(i);
             }
+        }
+    }
+
+    void CSAp_insert(int p1, int p2, std::vector<std::vector<double>> &P){
+        if( dmc[p1]>k || dmc[p2]>=k ){
+            return;
+        }
+        if(rdo_graph[p1].find(p2)!=rdo_graph[p1].end() || rdo_graph[p2].find(p1)!=rdo_graph[p2].end()){
+            return;
+        }
+        int state=r_dominate(vertexes, P[p1], P[p2]);
+        if(state==DOMINATE){
+            this->CSAp_update(p1, p2);
+        }else if(state==DOMINATED){
+            this->CSAp_update(p2, p1);
+        }else{
+            for(auto &child:children){
+                child->CSAp_insert(p1, p2, P);
+            }
+        }
+    }
+
+    inline void CSAp_update(int i, int j){
+        recursively_update_dmc(j);
+        CSAp_update_graph(i, j);
+        for(int id:rdo_graph[j]){
+            if(rdo_graph[i].find(id)==rdo_graph[i].end()){ // a new option
+                recursively_update_dmc(id);
+                CSAp_update_graph(i, id);
+            }
+        }
+    }
+
+    void CSAp_update_graph(int p1, int p2){
+        if(dmc[p2]>=k || rdo_graph[p1].find(p2)!=rdo_graph[p1].end()){
+            return;
+        }
+        rdo_graph[p1].insert(p2);
+        for(auto &child: children){
+            child->CSAp_update_graph(p1, p2);
         }
     }
 
