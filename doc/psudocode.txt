@@ -10,7 +10,7 @@
  * 3.         b=[]
  * 4.         for d in range(dim):
  * 5.             l=parent.bounds[d*2], u=parent.bounds[d*2+1]
- * 6.             b.add(l), b.add(l)
+ * 6.             b.add(l), b.add((l+u)/2)
  * 7.         parent.children.add(cell(b))
  * 8.     for d in range(dim): # if dim<3, there are dim children nodes
  * 9.         b=[]
@@ -86,7 +86,7 @@
  * # each cell add a r-dominate graph
  * # be careful such that dmc is a "dominated" count array
  * # but rdo_graph is a "dominate" graph
- * cell::CSAp_insert(i, j, p):
+ * cell::CSAp_insert(i, j, P):
  * 1. if this.dmc[i]>=k or this.dmc[j]>=k:
  * 2.     return
  * 3. if this.rdo_graph[i].find(j)==True or this.rdo_graph[j].find(i)==True: # a pruning
@@ -134,7 +134,7 @@
  * 3. for leaf in all_leaves:
  * 4.     leaf.superSet2RKS()   # OPTION 1 or OPTION 2
  *
- * cell::MDA_insert(id)
+ * cell::MDA_insert(id, P)
  * 1. theta=this.heap.top()  # a min heap with size k and initialized with 0
  * 2. lb, ub=this.bound(id)  # finding minimal and maximal share the same execution
  * 3. if ub>theta:          # may be one of r-k-skyband
@@ -145,5 +145,23 @@
  * 8.         this.s_rkskyband.add([id, lb, ub])
  * 9.     else:
  * 10.        for child in this.children:
- * 11.            child.MDA_insert(id)
+ * 11.            child.MDA_insert(id, P)
+ *
+ * cell::superSet2RKS()
+ * # sort sRKS by decreasing UB order, (sRKS-->sRKS')
+ * # test r-dominate
+ * 1. RKS=sRKS'[0:k] # include 0-th but not k-th
+ * 2. for i in range(k, sRKS'.size()):
+ * 3.     r_dominate_count=0
+ * 4.     p1=sRKS'[i]
+ * 5.     for j in range(0, RKS.size()):
+ * 6.         p2=RKS[j]
+ * 7.         if lb[p1]<lb[p2]:      # a pruning
+ * 8.             if this.rdominate(P[p2], P[p1]):
+ * 9.                 r_dominate_count+=1
+ * 10.                if r_dominate_count>=k: # a pruning, not necessary continue
+ * 11.                    break
+ * 12.    if r_dominate_count<k:
+ * 13.        RKS.add(p1)
+ *
  */

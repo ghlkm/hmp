@@ -67,6 +67,10 @@ int main(const int argc, const char** argv) {
         cout<<"CSA+ begin"<<endl;
         CSAp(*root_ptr, P);
         cout<<"CSA+ end"<<endl;
+    }else if(method==mMDA){
+        cout<<"MDA begin"<<endl;
+        MDA(*root_ptr, P);
+        cout<<"MDA end"<<endl;
     }
     auto ae = chrono::steady_clock::now();
     chrono::duration<double> elapsed_seconds= ae-ab;

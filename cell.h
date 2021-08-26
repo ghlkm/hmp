@@ -10,6 +10,8 @@
 #include <string>
 #include "utils.h"
 #include <unordered_set>
+#include <cmath>
+#include <algorithm>
 
 #define mCSA  1
 #define mCSAp 2
@@ -30,6 +32,13 @@ public:
     double dHeat; // No. of r-dominate relationships
 
     vector<unordered_set<int>> rdo_graph; // only used for CSA+, a "dominate" graph
+    vector<double> heap;  // only used for MDA, size k, a min heap
+
+    // only used for MDA, a superset of rkskyband, not empty if this cell is a leaf node
+    // each element: <id, <lb, ub>>
+    vector<pair<int, pair<double, double>>> s_rskyband;
+
+    vector<double> rskyband_lb_MDA; // each element: <id, lb>
 
     cell(std::vector<double> &b, int cur_level, int tar_level, int card, int K, int m=mHMDA){
         /*
@@ -52,9 +61,10 @@ public:
         if(cur_level<tar_level){
             if(dim>=3){
                 std::vector<double> tmp(2*dim);
-                for (int i = 0; i < dim; ++i) {
-                    tmp[i*2]=b[i*2];
-                    tmp[i*2+1]=b[i*2];
+                for (int d = 0; d < dim; ++d) {
+                    double l=this->bounds[d*2], u=this->bounds[d*2+1];
+                    tmp[d*2]=l;
+                    tmp[d*2+1]=(l+u)/2.0;
                 }
                 this->children.push_back(new cell(tmp, cur_level+1, tar_level, card, k, m));
             }
@@ -75,6 +85,9 @@ public:
         }
         if(m==mCSAp){
             this->rdo_graph=vector<unordered_set<int>>(card);
+        }
+        if(m==mMDA){
+            this->heap=vector<double>(k, 0.0);
         }
     }
 
@@ -107,17 +120,17 @@ public:
         }
     }
 
-    void recursively_update_dmc(int i){
+    void recursively_update_dmc(int i, int add=1){
         if(this->dmc[i]<k){
-            this->dmc[i]+=1;
+            this->dmc[i]+=add;
             for(auto &child: this->children){
-                child->recursively_update_dmc(i);
+                child->recursively_update_dmc(i, add);
             }
         }
     }
 
     void CSAp_insert(int p1, int p2, std::vector<std::vector<double>> &P){
-        if( dmc[p1]>k || dmc[p2]>=k ){
+        if( dmc[p1]>=k || dmc[p2]>=k ){
             return;
         }
         if(rdo_graph[p1].find(p2)!=rdo_graph[p1].end() || rdo_graph[p2].find(p1)!=rdo_graph[p2].end()){
@@ -150,12 +163,96 @@ public:
         if(dmc[p2]>=k || rdo_graph[p1].find(p2)!=rdo_graph[p1].end()){
             return;
         }
+        if(dmc[p1]>=k){
+            recursively_update_dmc(p2, k-dmc[p2]);
+            return;
+        }
         rdo_graph[p1].insert(p2);
         for(auto &child: children){
             child->CSAp_update_graph(p1, p2);
         }
     }
 
+    void MDA_insert(int id, std::vector<std::vector<double>> &P){
+        double theta=-heap.front();
+        double lb, ub;
+        get_lb_ub(P[id], lb, ub);
+        if(ub>theta){
+            if(lb>theta){
+                // heap push
+                heap.push_back(-lb);
+                std::push_heap(heap.begin(), heap.end());
+
+                // heap pop
+                std::pop_heap(heap.begin(), heap.end());
+                heap.pop_back();
+            }
+            if(this->isLeaf()){
+                s_rskyband.emplace_back(id, pair<double, double>(lb, ub));
+            }else{
+                for(auto &child: children){
+                    child->MDA_insert(id, P);
+                }
+            }
+        }
+    }
+
+    void MDA_superSet2RKS(std::vector<std::vector<double>> &P){
+        double theta=-heap.front();
+        vector<pair<int, pair<double, double>>> tmp; // TODO add to pseudo code
+        for (auto &i:s_rskyband) {
+            double ub=i.second.second;
+            if(ub>theta){
+                tmp.push_back(i);
+            }
+        }
+        sort(tmp.begin(), tmp.end(), [](auto &a, auto &b){
+           return a.second.second > b.second.second;
+        });
+        assert(tmp.size()>=k);
+        for (int i = 0; i <k ; ++i) {
+            this->rkskyband.push_back(tmp[i].first);
+            this->rskyband_lb_MDA.emplace_back(tmp[i].second.first);
+        }
+        for (int i = k; i <tmp.size() ; ++i) {
+            int r_dominate_count=0;
+            for (int j = 0; j < rkskyband.size(); ++j) {
+                if(tmp[i].second.first < rskyband_lb_MDA[j]){
+                    if(r_dominate(this->vertexes,  P[rkskyband[j]], P[tmp[i].first])){
+                        r_dominate_count+=1;
+                        if(r_dominate_count>=k){
+                            break;
+                        }
+                    }
+                }
+            }
+            if(r_dominate_count<k){
+                this->dmc[tmp[i].first]=r_dominate_count;
+                this->rkskyband.push_back(tmp[i].first);
+                this->rskyband_lb_MDA.emplace_back(tmp[i].second.first);
+            }
+        }
+    }
+
+
+    inline bool isLeaf() const{
+        return children.empty();
+    }
+
+    void get_lb_ub(std::vector<double> &p, double &lb, double &ub){
+        lb=INFINITY;
+        ub=0.0;
+        double tmp;
+        for(auto &v:vertexes){
+            tmp=p*v;
+            if(tmp>ub){
+                ub=tmp;
+            }
+            if(tmp<lb){
+                lb=tmp;
+            }
+        }
+    }
 
 };
 

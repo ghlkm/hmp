@@ -37,3 +37,14 @@ void CSAp(cell &root, std::vector<std::vector<double>> &P){
         }
     }
 }
+
+void MDA(cell &root, std::vector<std::vector<double>> &P){
+    for (int i = 0; i <P.size() ; ++i) {
+        root.MDA_insert(i, P);
+    }
+    vector<cell *> all_leaves;
+    get_all_leaves(root, all_leaves);
+    for(auto &leaf: all_leaves){
+        leaf->MDA_superSet2RKS(P);
+    }
+}

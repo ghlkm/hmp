@@ -11,4 +11,6 @@ void CSA(cell &root, std::vector<std::vector<double>> &P);
 
 void CSAp(cell &root, std::vector<std::vector<double>> &P);
 
+void MDA(cell &root, std::vector<std::vector<double>> &P);
+
 #endif //HEATMAP_HMP_H
