@@ -128,3 +128,13 @@ int r_dominate(std::vector<std::vector<double>> &vs, std::vector<double> &p1, st
     }
     return ret;
 }
+
+bool r_dominate(std::vector<double> &s1, std::vector<double> &s2){
+    for (int i = 0; i <s1.size() ; ++i) {
+        if(s2[i]>s1[i]){
+            return false;
+        }
+    }
+    return true;
+}
+

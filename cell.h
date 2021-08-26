@@ -210,15 +210,31 @@ public:
            return a.second.second > b.second.second;
         });
         assert(tmp.size()>=k);
+        vector<vector<double>> scores;
+
         for (int i = 0; i <k ; ++i) {
             this->rkskyband.push_back(tmp[i].first);
             this->rskyband_lb_MDA.emplace_back(tmp[i].second.first);
+            vector<double> s;
+            s.reserve(vertexes.size());
+            for (auto &v:vertexes) {
+                s.push_back(v*P[tmp[i].first]);
+            }
+            scores.push_back(s);
         }
+
         for (int i = k; i <tmp.size() ; ++i) {
             int r_dominate_count=0;
+            vector<double> s;
             for (int j = 0; j < rkskyband.size(); ++j) {
                 if(tmp[i].second.first < rskyband_lb_MDA[j]){
-                    if(r_dominate(this->vertexes,  P[rkskyband[j]], P[tmp[i].first])){
+                    if(s.empty()){
+                        s.reserve(vertexes.size());
+                        for (auto &v:vertexes) {
+                            s.push_back(v*P[tmp[i].first]);
+                        }
+                    }
+                    if(r_dominate(scores[j],s)){
                         r_dominate_count+=1;
                         if(r_dominate_count>=k){
                             break;
@@ -230,6 +246,13 @@ public:
                 this->dmc[tmp[i].first]=r_dominate_count;
                 this->rkskyband.push_back(tmp[i].first);
                 this->rskyband_lb_MDA.emplace_back(tmp[i].second.first);
+                if(s.empty()){
+                    s.reserve(vertexes.size());
+                    for (auto &v:vertexes) {
+                        s.push_back(v*P[tmp[i].first]);
+                    }
+                }
+                scores.push_back(s);
             }
         }
     }
