@@ -138,3 +138,78 @@ bool r_dominate(std::vector<double> &s1, std::vector<double> &s2){
     return true;
 }
 
+void kskyband_write(vector<vector<double>> &data, int k, string &filename, vector<vector<int>> &ret){
+    /*
+     * the k-skyband contains thoes records that are dominated by fewer than k others
+     */
+    ret=vector<vector<int>>(k);
+    vector<int> do_cnt(data.size(), 0);
+    vector<int> k_cnt(k, 0);
+    for (auto i = 0; i < data.size(); ++i) {
+        for (auto j = i + 1; j < data.size(); ++j) {
+            if (do_cnt[i] >= k) {
+                break;
+            }
+            if (v1_dominate_v2(data[i], data[j])) {
+                ++do_cnt[j];
+            } else if (v1_dominate_v2(data[j], data[i])) {
+                ++do_cnt[i];
+            }
+        }
+        if (do_cnt[i] < k) {
+            ret[do_cnt[i]].push_back(i);
+            k_cnt[do_cnt[i]]+=1;
+        }
+    }
+    cout<<"for k-skyband, # of options:"<<endl;
+    for (int l = 0; l <k ; ++l) {
+        cout<<"@k="<<l+1<<":num="<<k_cnt[l]<<endl;
+    }
+
+    fstream log;
+    log.open(filename, ios::out);
+
+    for (int i = 1; i <= k; ++i) {
+        log<<"#"<<i<<":";
+        for (int id: ret[i-1]) {
+            log<<id<<" ";
+        }
+        log<<endl;
+    }
+    log.close();
+}
+
+void kskyband_read(const string &filename, vector<vector<int>> &ret){
+    FILE *in=fopen(filename.c_str(), "r");
+    int cur;
+    char UNUSED;
+    int flag=1;
+    vector<int> one_onion;
+    while(flag){
+        flag=fscanf(in, "%d", &cur);
+        if(feof(in)){
+            break;
+        }
+        if(flag){
+            one_onion.push_back(cur);
+        }else{
+            flag=fscanf(in, "%c", &UNUSED);
+            if(flag){
+                if(UNUSED=='#'){
+                    flag=fscanf(in, "%d", &cur);
+                }
+                flag=fscanf(in, "%c", &UNUSED);
+                if(cur!=1){
+                    ret.push_back(one_onion);
+                    one_onion=vector<int>();
+                }
+            }// else eof
+        }
+    }
+    fclose(in);
+    ret.push_back(one_onion);
+    cout<<ret.size()<<endl;
+    for(auto &i:ret){
+        cout<<i.size()<<endl;
+    }
+}

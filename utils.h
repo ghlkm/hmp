@@ -25,4 +25,8 @@ inline bool v1_dominate_v2(vector<double>& v1, vector<double>& v2);
 void kskyband_nortree(vector<int> &ret, vector<vector<double>> &data,int k);
 
 bool r_dominate(std::vector<double> &s1, std::vector<double> &s2);
+
+void kskyband_write(vector<vector<double>> &data, int k, string &filename, vector<vector<int>> &ret);
+
+void kskyband_read (const string &filename, vector<vector<int>> &ret);
 #endif //HEATMAP_UTILS_H

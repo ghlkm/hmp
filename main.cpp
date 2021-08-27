@@ -42,6 +42,20 @@ int main(const int argc, const char** argv) {
     vector<vector<double>> P0=read_options(datafile, dim);
 
     vector<int> kskyband;
+    vector<vector<int>> w;
+    string s=string(datafile);
+    s+=".kskyband";
+    kskyband_write(P0, k, s, w);
+//    vector<vector<int>> r;
+//    kskyband_read(s, r);
+//    assert(w.size()==r.size());
+//    for (int l = 0; l < w.size(); ++l) {
+//        assert(w[l].size()==r[l].size());
+//        for (int i = 0; i < w[l].size(); ++i) {
+//            assert(w[l][i]==r[l][i]);
+//        }
+//    }
+    exit(0);
     kskyband_nortree(kskyband, P0, k);
 
     vector<vector<double>> P;
