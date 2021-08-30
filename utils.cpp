@@ -69,7 +69,7 @@ vector<vector<double>> read_options(const char* datafile, int dim){
             option[j]/=2.0;
         }
         P0.push_back(option);
-        if(P0.size()%1000==0){
+        if(P0.size()%10000==0){
             cout << P0.size() << " objects loaded" << endl;
         }
     }
@@ -212,4 +212,33 @@ void kskyband_read(const string &filename, vector<vector<int>> &ret){
     for(auto &i:ret){
         cout<<i.size()<<endl;
     }
+}
+
+int closeTo(double d){
+    int id=(int)d;
+    int idp1=id+1, idm1=id-1;
+    double d1=abs(d-idm1);
+    double d2=abs(d-id);
+    double d3=abs(d-idp1);
+    if(d1>d2){
+        if(d3>d2){
+            return id;
+        }else{
+            return idp1;
+        }
+    }else{
+        if(d3>d1){
+            return idm1;
+        }else{
+            return idp1;
+        }
+    }
+}
+
+double sum(vector<double> &v){
+    double ret=0.0;
+    for (double i:v) {
+        ret+=i;
+    }
+    return ret;
 }

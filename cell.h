@@ -12,11 +12,14 @@
 #include <unordered_set>
 #include <cmath>
 #include <algorithm>
+#include <set>
 
 #define mCSA  1
 #define mCSAp 2
 #define mMDA  3
-#define mHMDA 4
+#define mMDAp 4
+
+extern vector<int> cell_debug;
 
 class cell{
 public:
@@ -26,21 +29,28 @@ public:
     int k;
     std::vector<double> bounds;
     std::vector<std::vector<double>> vertexes;
-    std::vector<int> dmc; // "dominated" count array, dmc[i]=j means option i dominated by totally j options
+    std::vector<int> dmc; // only used for CSA, "dominated" count array, dmc[i]=j means option i dominated by totally j options
     double uHeat; // the k_th largest minimum score
     double rHeat; // No. of RSK
     double dHeat; // No. of r-dominate relationships
+    int cur_l; // current level
+    int tar_l; // target level
+    int method; // method, which cell
 
-    vector<unordered_set<int>> rdo_graph; // only used for CSA+, a "dominate" graph
+//    vector<unordered_set<int>> rdo_graph; // only used for CSA+, a "dominate" graph
+    vector<set<int>> rdo_graph; // only used for CSA+, a "dominate" graph
+
     vector<double> heap;  // only used for MDA, size k, a min heap
 
-    // only used for MDA, a superset of rkskyband, not empty if this cell is a leaf node
+    // only used for MDA and MDA+, a superset of rkskyband, not empty if this cell is a leaf node
     // each element: <id, <lb, ub>>
     vector<pair<int, pair<double, double>>> s_rskyband;
 
+    vector<int> mdap_s_rksyband;
+
     vector<double> rskyband_lb_MDA; // each element: <id, lb>
 
-    cell(std::vector<double> &b, int cur_level, int tar_level, int card, int K, int m=mHMDA){
+    cell(std::vector<double> &b, int cur_level, int tar_level, int card, int K, int m=mMDAp){
         /*
          * \para b, bounds
          * \para cur_level, this cell would be in which level of the quad-tree
@@ -52,57 +62,96 @@ public:
         uHeat=0.0;
         rHeat=0.0;
         dHeat=0.0;
+        cur_l=cur_level;
+        tar_l=tar_level;
+        method=m;
         this->k=K;
-        dmc=std::vector<int>(card, 0);
         // generate this cell's vertexes
         this->get_vertexes();
 
-        // begin to generate children
-        if(cur_level<tar_level){
-            if(dim>=3){
-                std::vector<double> tmp(2*dim);
-                for (int d = 0; d < dim; ++d) {
-                    double l=this->bounds[d*2], u=this->bounds[d*2+1];
-                    tmp[d*2]=l;
-                    tmp[d*2+1]=(l+u)/2.0;
-                }
-                this->children.push_back(new cell(tmp, cur_level+1, tar_level, card, k, m));
-            }
-            for (int d = 0; d <dim ; ++d) {
-                std::vector<double> tmp;
-                for (int d2 = 0; d2 < dim; ++d2) {
-                    double l=this->bounds[d*2], u=this->bounds[d*2+1];
-                    if(d==d2){
-                        tmp.push_back((l+u)/2.0);
-                        tmp.push_back(u);
-                    }else{
-                        tmp.push_back(l);
-                        tmp.push_back((l+u)/2.0);
-                    }
-                }
-                this->children.push_back(new cell(tmp, cur_level+1, tar_level, card, k, m));
-            }
-        }
         if(m==mCSAp){
-            this->rdo_graph=vector<unordered_set<int>>(card);
+//            this->rdo_graph=vector<unordered_set<int>>(card);
+            this->rdo_graph=vector<set<int>>(card);
         }
-        if(m==mMDA){
+        if(m==mMDA || m==mMDAp){
             this->heap=vector<double>(k, 0.0);
+        }else if(m==mCSA || m==mCSAp){
+            dmc=std::vector<int>(card, 0);
+        }
+        if(m==mCSA || m==mCSAp || m==mMDA || cur_level==0){ // root
+            if(cur_level<tar_level){
+                this->get_children(card, m);
+            }
         }
     }
 
-    void get_vertexes(){
-        for (int d = 0; d <dim ; ++d) {
-            std::vector<double> v(dim);
-            for (int d2 = 0; d2 < dim; ++d2) {
-                if(d==d2){
-                    v[d2]=this->bounds[d*2+1]; // add upper bound
+    void get_children(int card, int m){
+        double u=1.0;
+        double dis=(bounds[1]-bounds[0])/2;  // child should be divided by 2
+        double l=1.0-dis*dim;
+        unsigned int child_p_num=(1<<dim);
+        for(int iter=0; iter<child_p_num;++iter){
+            vector<double> lv(dim);
+            unsigned iter_cp=iter;
+            for (int j = 0; j < dim; ++j) {
+                if(iter_cp%2==0){
+                    lv[j]=bounds[j*2];
                 }else{
-                    v[d2]=this->bounds[d*2];   // add lower bound
+                    lv[j]=(bounds[j*2]+bounds[j*2+1])/2.0;
+                }
+                iter_cp=iter_cp>>1;
+            }
+            double slv=sum(lv);
+
+            if(u>slv && slv>l){
+                vector<double> child_b(dim*2);
+                for (int i = 0; i <dim ; ++i) {
+                    child_b[i*2]=lv[i];
+                    child_b[i*2+1]=lv[i]+dis;
+                }
+                this->children.push_back(new cell(child_b, cur_l+1, tar_l, card, k, m));
+            }
+        }
+        cell_debug[cur_l+1]+=this->children.size();
+    }
+
+    void get_vertexes(){
+        double sum_lb=0.0;
+        for (int d = 0; d <dim; ++d) {
+            sum_lb+=this->bounds[d*2];
+        }
+
+        double dis=this->bounds[1]-this->bounds[0];
+        int num_ub=closeTo((1.0-sum_lb)/dis);
+
+        assert(num_ub<dim);
+        // select num_ub from dim
+        std::vector<bool> v(dim);
+        std::fill(v.begin(), v.begin() + num_ub, true);
+        do {
+            vector<double> one_cb;
+            one_cb.reserve(dim);
+            for (int i = 0; i < dim; ++i) {
+                if (v[i]) {
+                    one_cb.push_back(this->bounds[2*i+1]);
+                }else{
+                    one_cb.push_back(this->bounds[2*i]);
                 }
             }
-            this->vertexes.push_back(v);
-        }
+            this->vertexes.push_back(one_cb);
+        } while (std::prev_permutation(v.begin(), v.end())); // forward next permutation
+
+//        for (int d = 0; d <dim ; ++d) {
+//            std::vector<double> v(dim);
+//            for (int d2 = 0; d2 < dim; ++d2) {
+//                if(d==d2){
+//                    v[d2]=this->bounds[d*2+1]; // add upper bound
+//                }else{
+//                    v[d2]=this->bounds[d*2];   // add lower bound
+//                }
+//            }
+//            this->vertexes.push_back(v);
+//        }
     }
 
     void CSA_insert(int p1, int p2, std::vector<std::vector<double>> &P){
@@ -243,7 +292,7 @@ public:
                 }
             }
             if(r_dominate_count<k){
-                this->dmc[tmp[i].first]=r_dominate_count;
+                this->dHeat+=r_dominate_count;
                 this->rkskyband.push_back(tmp[i].first);
                 this->rskyband_lb_MDA.emplace_back(tmp[i].second.first);
                 if(s.empty()){
@@ -262,7 +311,7 @@ public:
         return children.empty();
     }
 
-    void get_lb_ub(std::vector<double> &p, double &lb, double &ub){
+    inline void get_lb_ub(std::vector<double> &p, double &lb, double &ub){
         lb=INFINITY;
         ub=0.0;
         double tmp;
@@ -274,6 +323,53 @@ public:
             if(tmp<lb){
                 lb=tmp;
             }
+        }
+    }
+
+    inline void get_scores(std::vector<int> &ps, std::vector<std::vector<double>> &P,
+            std::vector<double> &lb, std::vector<double> &ub){
+        lb=std::vector<double>(ps.size());
+        ub=std::vector<double>(ps.size());
+        for (int i = 0; i <ps.size() ; ++i) {
+            this->get_lb_ub(P[ps[i]], lb[i], ub[i]);
+        }
+    }
+
+    void MDAp_insert(vector<int> &parent_sRSK, vector<vector<double>> &P){
+        assert(!parent_sRSK.empty());
+        vector<double> lbs, ubs;
+        this->get_scores(parent_sRSK, P, lbs, ubs);
+        double theta;
+        for (double &lb:lbs) {
+            theta=-heap.front();
+            if(lb>theta){
+                // heap push
+                heap.push_back(-lb);
+                std::push_heap(heap.begin(), heap.end());
+
+                // heap pop
+                std::pop_heap(heap.begin(), heap.end());
+                heap.pop_back();
+            }
+        }
+        theta=-heap.front();
+        for (int i = 0; i <parent_sRSK.size(); ++i) {
+            if(ubs[i]>theta){
+                this->mdap_s_rksyband.push_back(parent_sRSK[i]);
+                if(this->isLeaf()){ // a leaf node
+                    this->s_rskyband.emplace_back(parent_sRSK[i], pair<double, double>(lbs[i], ubs[i]));
+                }
+            }
+        }
+        if(cur_l<tar_l){
+            this->get_children(0, method);
+            for(auto &child:children){
+                child->MDAp_insert(this->mdap_s_rksyband, P);
+                delete (child);
+            }
+        }
+        if(isLeaf()){
+            this->MDA_superSet2RKS(P);
         }
     }
 

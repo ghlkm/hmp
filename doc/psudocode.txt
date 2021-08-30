@@ -151,17 +151,49 @@
  * # sort sRKS by decreasing UB order, (sRKS-->sRKS')
  * # test r-dominate
  * 1. RKS=sRKS'[0:k] # include 0-th but not k-th
- * 2. for i in range(k, sRKS'.size()):
- * 3.     r_dominate_count=0
- * 4.     p1=sRKS'[i]
- * 5.     for j in range(0, RKS.size()):
- * 6.         p2=RKS[j]
- * 7.         if lb[p1]<lb[p2]:      # a pruning
- * 8.             if this.rdominate(P[p2], P[p1]):
- * 9.                 r_dominate_count+=1
- * 10.                if r_dominate_count>=k: # a pruning, not necessary continue
- * 11.                    break
- * 12.    if r_dominate_count<k:
- * 13.        RKS.add(p1)
+ * 2. scores=[]
+ * 3. for id in RKS:
+ * 4.     scores.add(this.get_scores(P[i]))
+ * 5. for i in range(k, sRKS'.size()):
+ * 6.     r_dominate_count=0
+ * 7.     p1=sRKS'[i]
+ * 8.     s=this.get_scores(P[p1])
+ * 9.     for j in range(0, RKS.size()):
+ * 10.        p2=RKS[j]
+ * 11.        if lb[p1]<lb[p2]:      # a pruning
+ * 12.            if rdominate_by_scores(scores[p2], s):  # to reduce the duplicate computations of scores
+ * 13.                r_dominate_count+=1
+ * 14.                if r_dominate_count>=k: # a pruning, not necessary continue
+ * 15.                    break
+ * 16.    if r_dominate_count<k:
+ * 17.        RKS.add(p1)
+ * 18.        scores.add(s)
+ *
+ * rdominate_by_scores(s1, s2):
+ * 1. for i, j in (s1, s2):
+ * 2.     if i<j:
+ * 3.         return False
+ * 4. return True   # we assume there will be no 2 options are exactly the same
  *
  */
+
+ /*
+  * MDA+
+  *
+  * MDAp():
+  * 1. for id in kskyband:
+  * 2.     root.MDAp_insert(id)
+  * 3. for leaf in all_leaves:
+  * 4.     leaf.superSet2RKS()   # OPTION 1 or OPTION 2
+  *
+  * cell::MDAp_insert(parent_sRSK, P)
+  * 1. lbs, ubs=this.get_scores(parent_sRSK)
+  * 2. theta=the k-th largest lb in lbs
+  * 3. for id in parent_sRSK:
+  * 4.     if ubs[id]>theta:
+  * 5.         this.MDAp_sRSK.add(id)
+  * 6. for child in this.children:
+  * 7.     child.MDAp_insert(this.MDAp_sRSK, P)
+  *
+  */
+

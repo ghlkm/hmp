@@ -7,6 +7,9 @@
 
 using namespace std;
 
+vector<int> cell_debug;
+
+
 int m2m(const char* s){
     int ret=1;
     if(strcmp(s, "CSA") == 0){
@@ -15,8 +18,8 @@ int m2m(const char* s){
         return mCSAp;
     }else if(strcmp(s, "MDA") == 0){
         return mMDA;
-    }else if(strcmp(s, "HMDA") == 0){
-        return mHMDA;
+    }else if(strcmp(s, "MDA+") == 0){
+        return mMDAp;
     }else{
         return ret;
     }
@@ -45,9 +48,17 @@ int main(const int argc, const char** argv) {
     vector<vector<int>> w;
     string s=string(datafile);
     s+=".kskyband";
-    kskyband_write(P0, k, s, w);
-//    vector<vector<int>> r;
-//    kskyband_read(s, r);
+//    kskyband_write(P0, k, s, w);
+//    exit(0);
+
+    vector<vector<int>> r;
+    kskyband_read(s, r);
+    for (int ik=0;ik<k;++ik) {
+        for (int &i:r[ik]) {
+            kskyband.push_back(i);
+        }
+    }
+//    kskyband=vector<int>(kskyband.rbegin(), kskyband.rend());
 //    assert(w.size()==r.size());
 //    for (int l = 0; l < w.size(); ++l) {
 //        assert(w[l].size()==r[l].size());
@@ -55,8 +66,7 @@ int main(const int argc, const char** argv) {
 //            assert(w[l][i]==r[l][i]);
 //        }
 //    }
-    exit(0);
-    kskyband_nortree(kskyband, P0, k);
+//    kskyband_nortree(kskyband, P0, k);
 
     vector<vector<double>> P;
     P.reserve(kskyband.size());
@@ -71,7 +81,11 @@ int main(const int argc, const char** argv) {
         b.push_back(1.0);
     }
     int method=m2m(methodName);
+    cell_debug=vector<int>(h+1, 0);
+    cout<<"k-ksyband size: "<<P.size()<<endl;
+    cout<<sizeof(cell)<<endl;
     cell *root_ptr=new cell(b, 0, h, P.size(), k, method);
+//    exit(0);
     auto ab = chrono::steady_clock::now();
     if (method==mCSA) {
         cout<<"CSA begin"<<endl;
@@ -85,7 +99,13 @@ int main(const int argc, const char** argv) {
         cout<<"MDA begin"<<endl;
         MDA(*root_ptr, P);
         cout<<"MDA end"<<endl;
+    }else if(method==mMDAp){
+        cout<<"MDA+ begin"<<endl;
+        MDAp(*root_ptr, P);
+        cout<<"MDA+ end"<<endl;
     }
+    cout<<cell_debug<<endl;
+
     auto ae = chrono::steady_clock::now();
     chrono::duration<double> elapsed_seconds= ae-ab;
     cout << "Total time cost: " << elapsed_seconds.count() << endl;

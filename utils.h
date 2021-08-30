@@ -29,4 +29,9 @@ bool r_dominate(std::vector<double> &s1, std::vector<double> &s2);
 void kskyband_write(vector<vector<double>> &data, int k, string &filename, vector<vector<int>> &ret);
 
 void kskyband_read (const string &filename, vector<vector<int>> &ret);
+
+int closeTo(double d);
+
+double sum(vector<double> &v);
+
 #endif //HEATMAP_UTILS_H
