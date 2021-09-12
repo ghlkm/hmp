@@ -21,6 +21,15 @@
 
 extern vector<int> cell_debug;
 
+extern vector<int> vt_debug;
+
+extern long s_rsky_p_c;
+extern long rsky_c;
+extern long rtest_c;
+extern vector<long> dmc_p_c;
+extern vector<long> dg_p_c;
+
+
 class cell{
 public:
     std::vector<cell*> children;
@@ -85,6 +94,7 @@ public:
         }
     }
 
+
     void get_children(int card, int m){
         double u=1.0;
         double dis=(bounds[1]-bounds[0])/2;  // child should be divided by 2
@@ -113,6 +123,40 @@ public:
             }
         }
         cell_debug[cur_l+1]+=this->children.size();
+//        cout<<cur_l<<","<<this->children.size()<<endl;
+    }
+
+    cell* get_next_children(int &iter){
+        double u=1.0;
+        double dis=(bounds[1]-bounds[0])/2;  // child should be divided by 2
+        double l=1.0-dis*dim;
+        unsigned int child_p_num=(1<<dim);
+        while(iter<child_p_num){
+            vector<double> lv(dim);
+            unsigned iter_cp=iter;
+            for (int j = 0; j < dim; ++j) {
+                if(iter_cp%2==0){
+                    lv[j]=bounds[j*2];
+                }else{
+                    lv[j]=(bounds[j*2]+bounds[j*2+1])/2.0;
+                }
+                iter_cp=iter_cp>>1;
+            }
+            double slv=sum(lv);
+
+            if(u>slv && slv>l){
+                vector<double> child_b(dim*2);
+                for (int i = 0; i <dim ; ++i) {
+                    child_b[i*2]=lv[i];
+                    child_b[i*2+1]=lv[i]+dis;
+                }
+                cell_debug[cur_l+1]+=1;
+                return new cell(child_b, cur_l+1, tar_l, 0, k, method);
+            }else{
+                ++iter;
+            }
+        }
+        return nullptr;
     }
 
     void get_vertexes(){
@@ -140,23 +184,13 @@ public:
             }
             this->vertexes.push_back(one_cb);
         } while (std::prev_permutation(v.begin(), v.end())); // forward next permutation
-
-//        for (int d = 0; d <dim ; ++d) {
-//            std::vector<double> v(dim);
-//            for (int d2 = 0; d2 < dim; ++d2) {
-//                if(d==d2){
-//                    v[d2]=this->bounds[d*2+1]; // add upper bound
-//                }else{
-//                    v[d2]=this->bounds[d*2];   // add lower bound
-//                }
-//            }
-//            this->vertexes.push_back(v);
-//        }
+        vt_debug[cur_l]+=this->vertexes.size();
     }
 
     void CSA_insert(int p1, int p2, std::vector<std::vector<double>> &P){
         if(!(dmc[p1]>=k || dmc[p2]>=k)){
             int state=r_dominate(this->vertexes, P[p1], P[p2]);
+            rtest_c+=1;
             if(state==DOMINATE){
                 this->recursively_update_dmc(p2);
             } else if(state==DOMINATED){
@@ -166,6 +200,8 @@ public:
                     child->CSA_insert(p1, p2, P);
                 }
             }
+        }else{
+            dmc_p_c[cur_l]+=1;
         }
     }
 
@@ -180,12 +216,15 @@ public:
 
     void CSAp_insert(int p1, int p2, std::vector<std::vector<double>> &P){
         if( dmc[p1]>=k || dmc[p2]>=k ){
+            dmc_p_c[cur_l]+=1;
             return;
         }
         if(rdo_graph[p1].find(p2)!=rdo_graph[p1].end() || rdo_graph[p2].find(p1)!=rdo_graph[p2].end()){
+            dg_p_c[cur_l]+=1;
             return;
         }
         int state=r_dominate(vertexes, P[p1], P[p2]);
+        rtest_c+=1;
         if(state==DOMINATE){
             this->CSAp_update(p1, p2);
         }else if(state==DOMINATED){
@@ -198,11 +237,11 @@ public:
     }
 
     inline void CSAp_update(int i, int j){
-        recursively_update_dmc(j);
+//        recursively_update_dmc(j);
         CSAp_update_graph(i, j);
         for(int id:rdo_graph[j]){
             if(rdo_graph[i].find(id)==rdo_graph[i].end()){ // a new option
-                recursively_update_dmc(id);
+//                recursively_update_dmc(id);
                 CSAp_update_graph(i, id);
             }
         }
@@ -217,6 +256,7 @@ public:
             return;
         }
         rdo_graph[p1].insert(p2);
+        dmc[p2]+=1;
         for(auto &child: children){
             child->CSAp_update_graph(p1, p2);
         }
@@ -283,6 +323,7 @@ public:
                             s.push_back(v*P[tmp[i].first]);
                         }
                     }
+                    rtest_c+=1;
                     if(r_dominate(scores[j],s)){
                         r_dominate_count+=1;
                         if(r_dominate_count>=k){
@@ -308,7 +349,8 @@ public:
 
 
     inline bool isLeaf() const{
-        return children.empty();
+//        return children.empty();
+        return cur_l==tar_l;
     }
 
     inline void get_lb_ub(std::vector<double> &p, double &lb, double &ub){
@@ -335,7 +377,7 @@ public:
         }
     }
 
-    void MDAp_insert(vector<int> &parent_sRSK, vector<vector<double>> &P){
+    void MDAp_insert(vector<int> &parent_sRSK, vector<vector<double>> &P, long cnt=0){
         assert(!parent_sRSK.empty());
         vector<double> lbs, ubs;
         this->get_scores(parent_sRSK, P, lbs, ubs);
@@ -361,15 +403,28 @@ public:
                 }
             }
         }
+        cnt+=this->mdap_s_rksyband.size();
         if(cur_l<tar_l){
-            this->get_children(0, method);
-            for(auto &child:children){
-                child->MDAp_insert(this->mdap_s_rksyband, P);
-                delete (child);
+            unsigned int child_p_num=(1<<dim);
+            for (int i = 0; i < child_p_num; ++i) {
+                cell* child=this->get_next_children(i);
+                if(child!= nullptr){
+                    child->MDAp_insert(this->mdap_s_rksyband, P, cnt);
+                    delete (child);
+                }
             }
+//            this->get_children(0, method);
+//            for(auto &child:children){
+//                child->MDAp_insert(this->mdap_s_rksyband, P);
+//                delete (child);
+//            }
         }
         if(isLeaf()){
             this->MDA_superSet2RKS(P);
+            rsky_c+=this->rkskyband.size();
+        }
+        if(cnt>s_rsky_p_c){
+            s_rsky_p_c=cnt;
         }
     }
 
@@ -378,4 +433,5 @@ public:
 
 void get_all_leaves(cell &node, std::vector<cell*>& ret);
 
+void cal_mem(cell &node);
 #endif //HEATMAP_CELL_H

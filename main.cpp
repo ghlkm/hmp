@@ -1,14 +1,26 @@
 #include <iostream>
+
 #include "utils.h"
 #include "cell.h"
 #include "hmp.h"
 #include <cstring>
 #include <chrono>
+#include <fstream>
 
 using namespace std;
 
 vector<int> cell_debug;
 
+vector<int> vt_debug;
+
+extern long rsky_c; // CSA, CSA+, leaf
+extern long dmc_c;  // CSA, CSA+, all
+extern long rdo_g_c; // CSA+, dominate number
+extern long s_rsky_c; // MDA, all
+extern long s_rsky_p_c; // MDA+, max k
+extern vector<long> dmc_p_c;
+extern vector<long> dg_p_c;
+extern long rtest_c;
 
 int m2m(const char* s){
     int ret=1;
@@ -73,6 +85,9 @@ int main(const int argc, const char** argv) {
     for (int i:kskyband) {
         P.push_back(P0[i]);
     }
+    P0.clear();
+    vector<vector<double>> EMPTY;
+    P0.swap(EMPTY);
 
     vector<double> b;
     b.reserve(2*dim);
@@ -82,6 +97,7 @@ int main(const int argc, const char** argv) {
     }
     int method=m2m(methodName);
     cell_debug=vector<int>(h+1, 0);
+    vt_debug=vector<int>(h+1, 0);
     cout<<"k-ksyband size: "<<P.size()<<endl;
     cout<<sizeof(cell)<<endl;
     cell *root_ptr=new cell(b, 0, h, P.size(), k, method);
@@ -105,10 +121,43 @@ int main(const int argc, const char** argv) {
         cout<<"MDA+ end"<<endl;
     }
     cout<<cell_debug<<endl;
+    cout<<vt_debug<<endl;
 
     auto ae = chrono::steady_clock::now();
     chrono::duration<double> elapsed_seconds= ae-ab;
     cout << "Total time cost: " << elapsed_seconds.count() << endl;
 
+    cal_mem(*root_ptr);
+
+    cout << "rsky_c: " << rsky_c <<endl;
+    cout << "dmc_c: " << dmc_c <<endl;
+    cout << "rdo_g_c: " << rdo_g_c <<endl;
+    cout << "s_rsky_c: " << s_rsky_c <<endl;
+    cout << "s_rsky_p_c: " << s_rsky_p_c<<endl;
+    cout << dmc_p_c << endl;
+    cout << dg_p_c << endl;
+    cout << rtest_c << endl;
+
+    fstream log;
+    string path=string(datafile);
+    string df=path.substr(path.rfind('/'), path.size());
+    df=df.substr(0, df.rfind('.'));
+    string filename=string("/home/kemingli/data/log/")+df+
+            string("_k")+to_string(k)+
+            string ("_h")+to_string(h)+
+            string (methodName)+string (".log");
+    s+=".log";
+    log.open(filename, ios::out);
+    log << "Total time cost: " << elapsed_seconds.count() << endl;
+    log << "rsky_c: " << rsky_c <<endl;
+    log << "dmc_c: " << dmc_c <<endl;
+    log << "rdo_g_c: " << rdo_g_c <<endl;
+    log << "s_rsky_c: " << s_rsky_c <<endl;
+    log << "s_rsky_p_c: " << s_rsky_p_c<<endl;
+    log << dmc_p_c << endl;
+    log << dg_p_c << endl;
+    log << rtest_c << endl;
+
+    log.close();
     return 0;
 }

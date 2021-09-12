@@ -3,39 +3,34 @@
  * build cell:
  *
  * # bounds=[l_1, u_1, l_2, u_2, ..., l_d, u_d]
+ * # building a quad-tree
  *
- * recursively_build_tree(parent, cur_level, tar_level):
- * 1. if cur_level<tar_level:
- * 2.     if dim>=3:  # if dim>=3, there are dim+1 children nodes
- * 3.         b=[]
- * 4.         for d in range(dim):
- * 5.             l=parent.bounds[d*2], u=parent.bounds[d*2+1]
- * 6.             b.add(l), b.add((l+u)/2)
- * 7.         parent.children.add(cell(b))
- * 8.     for d in range(dim): # if dim<3, there are dim children nodes
- * 9.         b=[]
- * 10.        for d2 in range(dim):
- * 11.            l=parent.bounds[d*2], u=parent.bounds[d*2+1]
- * 12.            if d==d2:
- * 13.                b.add((l+u)/2)
- * 14.                b.add(u)
- * 15.            else:
- * 16.                b.add(l)
- * 17.                b.add((l+u)/2))
- * 18.        parent.children.add(cell(b))
- * 19.for child in parent.children:
- * 20.    recursively_build_tree(child, cur_level+1, tar_level)
+ * cell::get_children():
+ * # suppose lower bounds of cell is vl, upper bound is vu
+ * # |vl|_1<1, |vu|_1>1, vu_i=vl_i+0.5^curLevel
+ * # then u>|vl|_1>l
+ * 1. u=1 # lower bound of L1 norm of [lower bounds of cell]
+ * 2. l=1-pow(0.5, cur_level)*dim # lower bound of L1 norm of [lower bounds of cell]
+ * 3. for vl of all_case_of_vl: # there will be 2^dim cases of vl, check each one
+ * 4. if u>sum(vl) and sum(vl)>l: # test vl whether satisfy u>|vl|_1>l
+ * 5.    box=gen_box(vl)
+ * 6.    child=cell(box, curLevel+1)
+ * 7.    this.children.add(child)
  *
  * cell::get_vertexes():
- * # there are dim vertexes
- * 1. for d in range(dim):
- * 2.     v=[]
- * 3.     for d2 in range(dim):
- * 4.         if d==d2:
- * 5.             v.add(this.bounds[d*2+1])  # add upper bound
- * 6.         else:
- * 7.             v.add(this.bounds[d*2])    # add lower bound
- * 8.     this.vertexes.add(v)
+ * # upper_num=(1-sum(lower_bounds))/(0.5^curLevel)
+ * # there are combination number C(dim, upper_num) vertexes
+ * # from dim dimension, select upper_num attributes and make them equals to upper bound of the cell
+ * # the others dim-upper_num attributes equals lower bound of the cell
+ * 1. for uas in select_upperNum_attributes_from_dimAttr:
+ * 2.     upper_num=(1-sum(lower_bounds))/(0.5^curLevel)
+ * 3.     v=[]
+ * 4.     for i in range(0, dim):
+ * 5.         if i in uas:
+ * 6.             v.add(this.upper_bounds[i])
+ * 7.         else:
+ * 8.             v.add(this.lower_bounds[i])
+ * 9.     this.vertexes.add(v)
  */
 
 
@@ -44,9 +39,6 @@
  *     for each cell, calculate r-kskyband
  *
  */
-
-
-// the height is no more than 10
 
 
 /*

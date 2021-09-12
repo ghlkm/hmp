@@ -66,7 +66,6 @@ vector<T> operator*(const T &num, const vector<T> &v) {
 }
 
 
-
 template<typename T>
 vector<T> &operator*=(vector<T> &v, const T &num) {
     for (int i = 0; i < v.size(); ++i) {

@@ -5,6 +5,9 @@
 #include "hmp.h"
 #include <numeric>
 
+
+void baseLine(cell &root, )
+
 void CSA(cell &root, std::vector<std::vector<double>> &P){
     for (int i = 0; i <P.size() ; ++i) {
         for (int j = i+1; j <P.size() ; ++j) {
