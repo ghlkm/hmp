@@ -21,10 +21,14 @@ extern long s_rsky_p_c; // MDA+, max k
 extern vector<long> dmc_p_c;
 extern vector<long> dg_p_c;
 extern long rtest_c;
+extern long score_size; // baseline
+
 
 int m2m(const char* s){
     int ret=1;
-    if(strcmp(s, "CSA") == 0){
+    if(strcmp(s, "BS") == 0){
+        return mBASELINE;
+    }else if(strcmp(s, "CSA") == 0){
         return mCSA;
     }else if(strcmp(s, "CSA+") == 0){
         return mCSAp;
@@ -103,7 +107,11 @@ int main(const int argc, const char** argv) {
     cell *root_ptr=new cell(b, 0, h, P.size(), k, method);
 //    exit(0);
     auto ab = chrono::steady_clock::now();
-    if (method==mCSA) {
+    if(method==mBASELINE){
+        cout<<"Baseline begin"<<endl;
+        Baseline(*root_ptr, P);
+        cout<<"Baseline end"<<endl;
+    }else if (method==mCSA) {
         cout<<"CSA begin"<<endl;
         CSA(*root_ptr, P);
         cout<<"CSA end"<<endl;
@@ -134,6 +142,7 @@ int main(const int argc, const char** argv) {
     cout << "rdo_g_c: " << rdo_g_c <<endl;
     cout << "s_rsky_c: " << s_rsky_c <<endl;
     cout << "s_rsky_p_c: " << s_rsky_p_c<<endl;
+    cout << "score_size: " << score_size <<endl;
     cout << dmc_p_c << endl;
     cout << dg_p_c << endl;
     cout << rtest_c << endl;
@@ -154,10 +163,10 @@ int main(const int argc, const char** argv) {
     log << "rdo_g_c: " << rdo_g_c <<endl;
     log << "s_rsky_c: " << s_rsky_c <<endl;
     log << "s_rsky_p_c: " << s_rsky_p_c<<endl;
+    log << "score_size: " << score_size <<endl;
     log << dmc_p_c << endl;
     log << dg_p_c << endl;
     log << rtest_c << endl;
-
     log.close();
     return 0;
 }

@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <set>
 
+#define mBASELINE 0
 #define mCSA  1
 #define mCSAp 2
 #define mMDA  3
@@ -28,6 +29,7 @@ extern long rsky_c;
 extern long rtest_c;
 extern vector<long> dmc_p_c;
 extern vector<long> dg_p_c;
+extern long score_size; // baseline
 
 
 class cell{
@@ -126,7 +128,7 @@ public:
 //        cout<<cur_l<<","<<this->children.size()<<endl;
     }
 
-    cell* get_next_children(int &iter){
+    cell* get_next_children(int &iter){ // TODO optimize the efficient of this:: might not be important
         double u=1.0;
         double dis=(bounds[1]-bounds[0])/2;  // child should be divided by 2
         double l=1.0-dis*dim;
@@ -350,7 +352,7 @@ public:
 
     inline bool isLeaf() const{
 //        return children.empty();
-        return cur_l==tar_l;
+        return cur_l>=tar_l;
     }
 
     inline void get_lb_ub(std::vector<double> &p, double &lb, double &ub){
@@ -368,8 +370,16 @@ public:
         }
     }
 
-    inline void get_scores(std::vector<int> &ps, std::vector<std::vector<double>> &P,
-            std::vector<double> &lb, std::vector<double> &ub){
+    inline void get_scores(std::vector<double> &p, std::vector<double> &ret){
+        ret.clear();
+        ret.reserve(vertexes.size());
+        for(auto &v:vertexes){
+            ret.push_back(p*v);
+        }
+    }
+
+    inline void get_lu_scores(std::vector<int> &ps, std::vector<std::vector<double>> &P,
+                              std::vector<double> &lb, std::vector<double> &ub){
         lb=std::vector<double>(ps.size());
         ub=std::vector<double>(ps.size());
         for (int i = 0; i <ps.size() ; ++i) {
@@ -377,10 +387,18 @@ public:
         }
     }
 
+    inline void get_all_scores(std::vector<std::vector<double>> &P,
+                           std::vector<std::vector<double>> &scores){
+        scores=std::vector<std::vector<double>>(P.size());
+        for (int i = 0; i <P.size() ; ++i) {
+            this->get_scores(P[i], scores[i]);
+        }
+    }
+
     void MDAp_insert(vector<int> &parent_sRSK, vector<vector<double>> &P, long cnt=0){
         assert(!parent_sRSK.empty());
         vector<double> lbs, ubs;
-        this->get_scores(parent_sRSK, P, lbs, ubs);
+        this->get_lu_scores(parent_sRSK, P, lbs, ubs);
         double theta;
         for (double &lb:lbs) {
             theta=-heap.front();
@@ -404,7 +422,7 @@ public:
             }
         }
         cnt+=this->mdap_s_rksyband.size();
-        if(cur_l<tar_l){
+        if(!isLeaf()){
             unsigned int child_p_num=(1<<dim);
             for (int i = 0; i < child_p_num; ++i) {
                 cell* child=this->get_next_children(i);
@@ -418,8 +436,7 @@ public:
 //                child->MDAp_insert(this->mdap_s_rksyband, P);
 //                delete (child);
 //            }
-        }
-        if(isLeaf()){
+        }else{
             this->MDA_superSet2RKS(P);
             rsky_c+=this->rkskyband.size();
         }
@@ -428,6 +445,46 @@ public:
         }
     }
 
+
+    void Baseline_insert(vector<vector<double>> &P){
+        if(isLeaf()){
+            assert(!P.empty());
+            vector<vector<double>> s;
+            this->get_all_scores(P, s);
+            for (int i = 0; i <P.size() ; ++i) {
+                int do_cnt=0;
+                for (int j = 0; j < P.size(); ++j) {
+                    if(i==j){
+                        continue;
+                    }
+                    rtest_c+=1;
+                    if(r_dominate(s[j], s[i])){
+                        ++do_cnt;
+                        if(do_cnt>=k){
+                            break;
+                        }
+                    }
+                }
+                if(do_cnt<k){
+                    this->rkskyband.push_back(i);
+                }
+            }
+            long tmp=0;
+            for (auto &v:s) {
+                tmp+=v.size();
+            }
+            score_size=tmp>score_size?tmp:score_size;
+        }else{
+            unsigned int child_p_num=(1<<dim);
+            for (int i = 0; i < child_p_num; ++i) {
+                cell* child=this->get_next_children(i);
+                if(child!= nullptr){
+                    child->Baseline_insert(P);
+                    delete (child);
+                }
+            }
+        }
+    }
 };
 
 

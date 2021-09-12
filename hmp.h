@@ -7,6 +7,9 @@
 #include "cell.h"
 #include <vector>
 
+
+void Baseline(cell &root, std::vector<std::vector<double>> &P);
+
 void CSA(cell &root, std::vector<std::vector<double>> &P);
 
 void CSAp(cell &root, std::vector<std::vector<double>> &P);

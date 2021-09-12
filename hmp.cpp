@@ -6,7 +6,11 @@
 #include <numeric>
 
 
-void baseLine(cell &root, )
+void Baseline(cell &root, std::vector<std::vector<double>> &P){
+    for(auto &child:root.children){
+        child->Baseline_insert(P);
+    }
+}
 
 void CSA(cell &root, std::vector<std::vector<double>> &P){
     for (int i = 0; i <P.size() ; ++i) {
@@ -69,4 +73,6 @@ void MDAp(cell &root, std::vector<std::vector<double>> &P){
         child->MDAp_insert(idx, P);
     }
 }
+
+
 

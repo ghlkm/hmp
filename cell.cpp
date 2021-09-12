@@ -21,9 +21,10 @@ long rdo_g_c=0; // CSA+, dominate number
 long s_rsky_c=0; // MDA, all
 long s_rsky_p_c=0; // MDA+, max k
 long rtest_c=0; // r-dominate test count
-
+long score_size=0; // baseline
 vector<long> dmc_p_c=vector<long>(10, 0);
 vector<long> dg_p_c=vector<long>(10, 0);
+
 
 void cal_mem(cell &node){
     if(node.method==mCSA){

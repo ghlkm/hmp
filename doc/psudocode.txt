@@ -179,7 +179,7 @@
   * 4.     leaf.superSet2RKS()   # OPTION 1 or OPTION 2
   *
   * cell::MDAp_insert(parent_sRSK, P)
-  * 1. lbs, ubs=this.get_scores(parent_sRSK)
+  * 1. lbs, ubs=this.get_lu_scores(parent_sRSK)
   * 2. theta=the k-th largest lb in lbs
   * 3. for id in parent_sRSK:
   * 4.     if ubs[id]>theta:
