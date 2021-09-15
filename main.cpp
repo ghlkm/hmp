@@ -164,7 +164,7 @@ int main(const int argc, const char** argv) {
     string path=string(datafile);
     string df=path.substr(path.rfind('/'), path.size());
     df=df.substr(0, df.rfind('.'));
-    string filename=string("/home/kemingli/data/log/")+df+
+    string filename=string("~/data/log/")+df+
             string("_k")+to_string(k)+
             string ("_h")+to_string(h)+
             string (methodName)+string (".log");

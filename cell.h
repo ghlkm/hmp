@@ -1,7 +1,3 @@
-//
-// Created by 12859 on 2021/8/25.
-//
-
 
 #ifndef HEATMAP_CELL_H
 #define HEATMAP_CELL_H

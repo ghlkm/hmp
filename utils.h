@@ -1,6 +1,4 @@
-//
-// Created by 12859 on 2021/8/25.
-//
+
 
 #ifndef HEATMAP_UTILS_H
 #define HEATMAP_UTILS_H
