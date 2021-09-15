@@ -1,0 +1,5 @@
+- k, topk
+- d, dimension of the problem
+- f, option data file, an option can be represented as "id L1 L2 ... Ld U1 U2 ... Ud"
+- m, method name, "CSA", "CSA+", "MDA", "MDA+"
+- h, the height of quad-tree
