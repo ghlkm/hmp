@@ -59,6 +59,7 @@ int main(const int argc, const char** argv) {
     const char* methodName = read(argc, argv, "-m", "");
     const char* datafile = read(argc, argv, "-f", "");  // option file name
     int h = atoi(read(argc, argv, "-h", ""));
+    int method=m2m(methodName);
 
     vector<vector<double>> P0=read_options(datafile, dim);
 
@@ -91,9 +92,11 @@ int main(const int argc, const char** argv) {
     for (int i:kskyband) {
         P.push_back(P0[i]);
     }
-    P0.clear();
-    vector<vector<double>> EMPTY;
-    P0.swap(EMPTY);
+    if(method!=mUTK){
+        P0.clear();
+        vector<vector<double>> EMPTY;
+        P0.swap(EMPTY);
+    }
 
     vector<double> b;
     b.reserve(2*dim);
@@ -101,12 +104,16 @@ int main(const int argc, const char** argv) {
         b.push_back(0.0);
         b.push_back(1.0);
     }
-    int method=m2m(methodName);
     cell_debug=vector<int>(h+1, 0);
     vt_debug=vector<int>(h+1, 0);
     cout<<"k-ksyband size: "<<P.size()<<endl;
     cout<<sizeof(cell)<<endl;
-    cell *root_ptr=new cell(b, 0, h, P.size(), k, method);
+    cell *root_ptr=nullptr;
+    if(method!=mUTK){
+        root_ptr=new cell(b, 0, h, P0.size(), k, method);
+    }else{
+        root_ptr=new cell(b, 0, h, P.size(), k, method);
+    }
 //    exit(0);
     auto ab = chrono::steady_clock::now();
     if(method==mBASELINE){
@@ -115,7 +122,7 @@ int main(const int argc, const char** argv) {
         cout<<"Baseline end"<<endl;
     }else if(method==mUTK){
         cout<<"Baseline utk begin"<<endl;
-        Baseline2(*root_ptr, P);
+        Baseline2(*root_ptr, P0);
         cout<<"Baseline utk end"<<endl;
     }else if (method==mCSA) {
         cout<<"CSA begin"<<endl;

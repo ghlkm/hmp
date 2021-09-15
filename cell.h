@@ -489,7 +489,7 @@ public:
 
     void Baseline2_insert(vector<vector<double>> &P, Rtree *rtree_rt, unordered_map<long int, RtreeNode *> &ramTree){
         if(isLeaf()){
-            long tmp=utk_rskyband(this->vertexes, this->dim, *rtree_rt, this->rkskyband, P, ramTree, this->k);
+            long tmp=utk_rskyband(this->vertexes, this->dim, *rtree_rt, this->rkskyband, P, ramTree, this->k)*4;
             score_size=tmp>score_size?tmp:score_size;
         }else{
             unsigned int child_p_num=(1<<dim);

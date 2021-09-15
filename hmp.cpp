@@ -21,7 +21,7 @@ void Baseline2(cell &root, std::vector<std::vector<double>> &P){
     for(auto &child:root.children){
         child->Baseline2_insert(P, rtree_rt, ramTree);
     }
-    score_size+=ramTree.size()*4*1024;
+    score_size+=ramTree.size()*1024;
 }
 
 void CSA(cell &root, std::vector<std::vector<double>> &P){
