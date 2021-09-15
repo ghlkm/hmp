@@ -106,28 +106,7 @@ void kskyband_nortree(vector<int> &ret, vector<vector<double>> &data,int k) {
     }
 }
 
-int r_dominate(std::vector<std::vector<double>> &vs, std::vector<double> &p1, std::vector<double> &p2){
-    int ret=NONDO;
-    double p1s, p2s;
-    for (auto &v: vs) {
-        p1s=p1*v;
-        p2s=p2*v;
-        if(p1s>p2s){
-            if(ret==DOMINATED){
-                return NONDO;
-            }else{
-                ret=DOMINATE;
-            }
-        }else if(p1s<p2s){
-            if(ret==DOMINATE){
-                return NONDO;
-            }else{
-                ret=DOMINATED;
-            }
-        }
-    }
-    return ret;
-}
+
 
 bool r_dominate(std::vector<double> &s1, std::vector<double> &s2){
     for (int i = 0; i <s1.size() ; ++i) {
@@ -239,6 +218,113 @@ double sum(vector<double> &v){
     double ret=0.0;
     for (double i:v) {
         ret+=i;
+    }
+    return ret;
+}
+
+
+void rtreeRAM(const Rtree& rt, unordered_map<long int, RtreeNode*>& ramTree)
+{
+    ramTree.clear();
+    queue<long int> H;
+    RtreeNode* node;
+    H.push(rt.m_memory.m_rootPageID);
+    long int pageID;
+    while (!H.empty())
+    {
+        pageID = H.front();
+        H.pop();
+        node = rt.m_memory.loadPage(pageID);
+        ramTree[pageID] = node;
+        if (node->isLeaf() == false)
+        {
+            for (int i = 0; i < node->m_usedspace; i++)
+            {
+                H.push(node->m_entry[i]->m_id);
+            }
+        }
+    }
+}
+
+int countRecords(Rtree& a_rtree, int pageID)
+{
+    int sumRecords = 0;
+    RtreeNode* node = a_rtree.m_memory.loadPage(pageID);
+    if (node->isLeaf())
+    {
+        sumRecords = node->m_usedspace;
+    }
+    else
+    {
+        for (int i = 0; i < node->m_usedspace; i++)
+        {
+            sumRecords += countRecords(a_rtree, node->m_entry[i]->m_id);
+        }
+    }
+    delete node;
+    return sumRecords;
+}
+
+void aggregateRecords(Rtree& a_rtree)
+{
+    queue<long int> H;
+    RtreeNode* node;
+    H.push(a_rtree.m_memory.m_rootPageID);
+    long int pageID;
+
+    while (!H.empty())
+    {
+        pageID = H.front();
+        H.pop();
+        node = a_rtree.m_memory.loadPage(pageID);
+
+        if (node->isLeaf() == false)
+        {
+            for (int i = 0; i < node->m_usedspace; i++)
+            {
+                node->m_entry[i]->num_records = countRecords(a_rtree, node->m_entry[i]->m_id);
+                H.push(node->m_entry[i]->m_id);
+            }
+        }
+        a_rtree.m_memory.writePage(pageID, node);
+    }
+}
+
+
+
+bool r_dominate(vector<vector<float>>& vs, vector<float> &v1, vector<float>& v2){
+    double p1s, p2s;
+    for (auto &v: vs) {
+        p1s=v1*v;
+        p2s=v2*v;
+        if(p1s>p2s){
+        }else if(p1s<p2s){
+            return false;
+        }
+    }
+    return true;
+}
+
+
+int r_dominate(std::vector<std::vector<double>> &vs, std::vector<double> &p1, std::vector<double> &p2){
+    int ret=NONDO;
+    double p1s, p2s;
+    for (auto &v: vs) {
+        p1s=p1*v;
+        p2s=p2*v;
+        if(p1s>p2s){
+            if(ret==DOMINATED){
+                return NONDO;
+            }else{
+                ret=DOMINATE;
+            }
+        }else if(p1s<p2s){
+            if(ret==DOMINATE){
+                return NONDO;
+            }else{
+                ret=DOMINATED;
+            }
+        }
     }
     return ret;
 }

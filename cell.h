@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <set>
 
+#define mUTK -1
 #define mBASELINE 0
 #define mCSA  1
 #define mCSAp 2
@@ -485,6 +486,23 @@ public:
             }
         }
     }
+
+    void Baseline2_insert(vector<vector<double>> &P, Rtree *rtree_rt, unordered_map<long int, RtreeNode *> &ramTree){
+        if(isLeaf()){
+            long tmp=utk_rskyband(this->vertexes, this->dim, *rtree_rt, this->rkskyband, P, ramTree, this->k);
+            score_size=tmp>score_size?tmp:score_size;
+        }else{
+            unsigned int child_p_num=(1<<dim);
+            for (int i = 0; i < child_p_num; ++i) {
+                cell* child=this->get_next_children(i);
+                if(child!= nullptr){
+                    child->Baseline2_insert(P, rtree_rt, ramTree);
+                    delete (child);
+                }
+            }
+        }
+    }
+
 };
 
 

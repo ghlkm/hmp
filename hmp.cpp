@@ -4,12 +4,24 @@
 
 #include "hmp.h"
 #include <numeric>
+#include <rtree.h>
 
 
 void Baseline(cell &root, std::vector<std::vector<double>> &P){
     for(auto &child:root.children){
         child->Baseline_insert(P);
     }
+}
+
+void Baseline2(cell &root, std::vector<std::vector<double>> &P){
+    unordered_map<long int, RtreeNode *> ramTree;
+    Rtree *rtree_rt= nullptr;
+    build_rtree(rtree_rt, ramTree, P);
+    cout<<"rtree build finish"<<endl;
+    for(auto &child:root.children){
+        child->Baseline2_insert(P, rtree_rt, ramTree);
+    }
+    score_size+=ramTree.size()*4*1024;
 }
 
 void CSA(cell &root, std::vector<std::vector<double>> &P){

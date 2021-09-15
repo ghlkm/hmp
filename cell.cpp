@@ -30,6 +30,9 @@ void cal_mem(cell &node){
     if(node.method==mCSA){
         rsky_c+=node.rkskyband.size();
         dmc_c+=node.dmc.size();
+        for (auto i:node.dmc) {
+            score_size+=i;
+        }
     }else if(node.method==mCSAp){
         rsky_c+=node.rkskyband.size();
         dmc_c+=node.dmc.size();

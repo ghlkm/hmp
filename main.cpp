@@ -28,6 +28,8 @@ int m2m(const char* s){
     int ret=1;
     if(strcmp(s, "BS") == 0){
         return mBASELINE;
+    }else if(strcmp(s, "UTK") == 0){
+        return mUTK;
     }else if(strcmp(s, "CSA") == 0){
         return mCSA;
     }else if(strcmp(s, "CSA+") == 0){
@@ -111,6 +113,10 @@ int main(const int argc, const char** argv) {
         cout<<"Baseline begin"<<endl;
         Baseline(*root_ptr, P);
         cout<<"Baseline end"<<endl;
+    }else if(method==mUTK){
+        cout<<"Baseline utk begin"<<endl;
+        Baseline2(*root_ptr, P);
+        cout<<"Baseline utk end"<<endl;
     }else if (method==mCSA) {
         cout<<"CSA begin"<<endl;
         CSA(*root_ptr, P);
