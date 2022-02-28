@@ -15,10 +15,13 @@ void Baseline2(cell &root, std::vector<std::vector<double>> &P){
     Rtree *rtree_rt= nullptr;
     build_rtree(rtree_rt, ramTree, P);
     cout<<"rtree build finish"<<endl;
+    s_rsky_p_c+=root.dim*2+root.vertexes.size()*root.dim;
+
     for(auto &child:root.children){
+        s_rsky_p_c+=child->dim*2+child->vertexes.size()*child->dim;
         child->Baseline2_insert(P, rtree_rt, ramTree);
     }
-    score_size+=ramTree.size()*1024;
+//    score_size+=ramTree.size()*1024;
 }
 
 void CSA(cell &root, std::vector<std::vector<double>> &P){

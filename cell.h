@@ -346,7 +346,6 @@ public:
         }
     }
 
-
     inline bool isLeaf() const{
 //        return children.empty();
         return cur_l>=tar_l;
@@ -483,21 +482,49 @@ public:
         }
     }
 
+//    void Baseline2_insert(vector<vector<double>> &P, Rtree *rtree_rt, unordered_map<long int, RtreeNode *> &ramTree){
+//        if(isLeaf()){
+//            long tmp=utk_rskyband(this->vertexes, this->dim, *rtree_rt, this->rkskyband, P, ramTree, this->k)*4;
+//            score_size=tmp>score_size?tmp:score_size;
+//        }else{
+//            unsigned int child_p_num=(1<<dim);
+//            for (int i = 0; i < child_p_num; ++i) {
+//                cell* child=this->get_next_children(i);
+//                if(child!= nullptr){
+//                    child->Baseline2_insert(P, rtree_rt, ramTree);
+//                    delete (child);
+//                }
+//            }
+//        }
+//    }
     void Baseline2_insert(vector<vector<double>> &P, Rtree *rtree_rt, unordered_map<long int, RtreeNode *> &ramTree){
         if(isLeaf()){
             long tmp=utk_rskyband(this->vertexes, this->dim, *rtree_rt, this->rkskyband, P, ramTree, this->k)*4;
-            score_size=tmp>score_size?tmp:score_size;
+            score_size=(tmp*2+s_rsky_p_c)>score_size?(tmp*2+s_rsky_p_c):score_size;
         }else{
+//            // TODO delete me later
+//            if(score_size!=0){
+//                return;
+//            }
+//            // TODO delete me later
             unsigned int child_p_num=(1<<dim);
             for (int i = 0; i < child_p_num; ++i) {
+//                // TODO delete me later
+//                if(score_size!=0){
+//                    return;
+//                }
+//                // TODO delete me later
                 cell* child=this->get_next_children(i);
                 if(child!= nullptr){
+                    s_rsky_p_c+=child->dim*2+child->vertexes.size()*child->dim;
                     child->Baseline2_insert(P, rtree_rt, ramTree);
+                    s_rsky_p_c-=child->dim*2+child->vertexes.size()*child->dim;
                     delete (child);
                 }
             }
         }
     }
+
 
 };
 

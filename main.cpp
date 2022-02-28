@@ -110,9 +110,9 @@ int main(const int argc, const char** argv) {
     cout<<sizeof(cell)<<endl;
     cell *root_ptr=nullptr;
     if(method!=mUTK){
-        root_ptr=new cell(b, 0, h, P0.size(), k, method);
-    }else{
         root_ptr=new cell(b, 0, h, P.size(), k, method);
+    }else{
+        root_ptr=new cell(b, 0, h, P0.size(), k, method);
     }
 //    exit(0);
     auto ab = chrono::steady_clock::now();
@@ -140,6 +140,12 @@ int main(const int argc, const char** argv) {
         cout<<"MDA+ begin"<<endl;
         MDAp(*root_ptr, P);
         cout<<"MDA+ end"<<endl;
+//    }else if(method==mTopK){
+//        // usual rtree top-k
+//    }else if(method==mTopkP){
+//        // usual rtree top-k and initialize bound as MaxMinK
+//        // first find
+
     }
     cout<<cell_debug<<endl;
     cout<<vt_debug<<endl;
