@@ -2,7 +2,7 @@
 
 This is a C++ project for summited paper:
 
-***Quantifying the Competitiveness of a Market in Relation to User Preferences*** 
+***Quantifying the Competitiveness of a Dataset in Relation to User Preferences*** 
 
 We supply using cmake to compile our project in a linux machine 
 (if you are using windows, you could download cygwin with gcc/g++ and cmake), 
