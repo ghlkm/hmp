@@ -9,7 +9,7 @@ We supply using cmake to compile our project in a linux machine
 and the default compile setting is using O3 optimization.
 (If you are interesting in the compile details, please refer to CMakeLists.txt)
 
-Our project only use standard C++ libraries, which means you don't need to download any additional libs.
+**Our project only uses standard C++ libraries, which means you don't need to download any other additional libs.**
 
 Download make and cmake
 -----
@@ -38,7 +38,7 @@ git clone https://github.com/efbeb99/hmp.git
 ```
 go to the directory of this project:
 ```
-cd klevel
+cd hmp
 ```
 make a build directory:
 ```

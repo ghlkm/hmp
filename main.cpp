@@ -38,6 +38,10 @@ int m2m(const char* s){
         return mMDA;
     }else if(strcmp(s, "MDA+") == 0){
         return mMDAp;
+    }else if(strcmp(s, "TOPK")==0){
+        return mTOPK1;
+    }else if(strcmp(s, "TOPK+")==0){
+        return mTOPK2;
     }else{
         return ret;
     }
@@ -140,12 +144,17 @@ int main(const int argc, const char** argv) {
         cout<<"MDA+ begin"<<endl;
         MDAp(*root_ptr, P);
         cout<<"MDA+ end"<<endl;
-//    }else if(method==mTopK){
-//        // usual rtree top-k
-//    }else if(method==mTopkP){
-//        // usual rtree top-k and initialize bound as MaxMinK
-//        // first find
-
+    }else if(method==mTOPK1){
+        // usual rtree top-k
+        unordered_map<long int, RtreeNode *> empty_now; // not empty later
+        topk_multi(*root_ptr, k,  P, 100, nullptr, empty_now, false);
+    }else if(method==mTOPK2){
+        // usual rtree top-k and initialize bound as MaxMinK
+        // 1. first find weight vector in which cell
+        // 2. then find the cell's MaxMin_k
+        // 3. find topk using MaxMin_k as a bound to prune
+        unordered_map<long int, RtreeNode *> empty_now; // not empty later
+        topk_multi(*root_ptr, k,  P, 100, nullptr, empty_now, true);
     }
     cout<<cell_debug<<endl;
     cout<<vt_debug<<endl;

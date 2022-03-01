@@ -17,4 +17,7 @@ void MDA(cell &root, std::vector<std::vector<double>> &P);
 
 void MDAp(cell &root, std::vector<std::vector<double>> &P);
 
+void topk_multi(cell &root, int k,  std::vector<std::vector<double>> &P, int num,
+                Rtree *rtree_rt, unordered_map<long int, RtreeNode *> &ramTree, bool uHeat);
+
 #endif //HEATMAP_HMP_H
