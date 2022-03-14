@@ -40,14 +40,7 @@ go to the directory of this project:
 ```
 cd hmp
 ```
-make a build directory:
-```
-mkdir build
-``` 
-go to build directory:
-```
-cd build
-``` 
+
 List build generators, the system will tell you which generator you should use <br />
 (e.g., a linux system would tell you "Unix Makefiles"):
 ```
@@ -55,7 +48,7 @@ cmake --help
 ``` 
 set cmake configurations:
 ```
-cmake -G "Unix Makefiles" .. # sometimes not "Unix Makefiles", depend on your OS
+cmake -G "Unix Makefiles" . # sometimes not "Unix Makefiles", depend on your OS
 ```
 build this project:
 ```
@@ -63,11 +56,31 @@ cmake --build . # it may should a lot of warnings because I set "-Wall" in CMake
 ```
 After run command as listed above, you would generate a file called "heatmap" in linux machines or "heatmap.exe" in windows machines. 
 
+Dataset
+------
+the full option dataset link: <br />
+https://drive.google.com/drive/folders/1LKJNh6u4-d-uHpLciiKXU0COKo4qJUAW?usp=sharing
+
 Run our project:
 -----
-a running example:
+Before running our project, please download the dataset with the link mentioned above
+and place the dataset as something like:<br />
+./rtree/  <br />
+./data/inde/ <br />
+./data/cor/ <br />
+./data/anti/ <br />
+./data/real/  <br />
+./log/ <br />
+./doc/ <br />
+./CMakeLists.txt <br />
+balabalabala <br />
+./main.cpp <br />
+./heatmap <br />
+
+
+A running example:
 ```
-./heatmap -k 10 -d 4 -m MDA+ -h 5 -f U500K4.dat
+./heatmap -k 10 -d 4 -m MDA+ -h 5 -f ./data/inde/U500K4.dat
 ```
 parameter explanations:
 - k, topk
@@ -76,5 +89,180 @@ parameter explanations:
 - m, method name, "UTK", "CSA", "CSA+", "MDA", "MDA+"
 - h, the height of quad-tree, \lambda=2^h
 
-the full option dataset link: <br />
-**TODO** 
+
+Experiment reproduce:<br />
+----
+Figure 8: Effect of |P| 
+```
+./heatmap -k 10 -d 4 -m BL -h 5 -f ./data/inde/U100K4.dat
+./heatmap -k 10 -d 4 -m BL -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 4 -m BL -h 5 -f ./data/inde/U1000K4.dat
+./heatmap -k 10 -d 4 -m BL -h 5 -f ./data/inde/U5000K4.dat
+./heatmap -k 10 -d 4 -m BL -h 5 -f ./data/inde/U10000K4.dat
+
+./heatmap -k 10 -d 4 -m CSA -h 5 -f ./data/inde/U100K4.dat
+./heatmap -k 10 -d 4 -m CSA -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 4 -m CSA -h 5 -f ./data/inde/U1000K4.dat
+./heatmap -k 10 -d 4 -m CSA -h 5 -f ./data/inde/U5000K4.dat
+./heatmap -k 10 -d 4 -m CSA -h 5 -f ./data/inde/U10000K4.dat
+
+./heatmap -k 10 -d 4 -m CSA+ -h 5 -f ./data/inde/U100K4.dat
+./heatmap -k 10 -d 4 -m CSA+ -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 4 -m CSA+ -h 5 -f ./data/inde/U1000K4.dat
+./heatmap -k 10 -d 4 -m CSA+ -h 5 -f ./data/inde/U5000K4.dat
+./heatmap -k 10 -d 4 -m CSA+ -h 5 -f ./data/inde/U10000K4.dat
+
+./heatmap -k 10 -d 4 -m MDA -h 5 -f ./data/inde/U100K4.dat
+./heatmap -k 10 -d 4 -m MDA -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 4 -m MDA -h 5 -f ./data/inde/U1000K4.dat
+./heatmap -k 10 -d 4 -m MDA -h 5 -f ./data/inde/U5000K4.dat
+./heatmap -k 10 -d 4 -m MDA -h 5 -f ./data/inde/U10000K4.dat
+
+./heatmap -k 10 -d 4 -m MDA+ -h 5 -f ./data/inde/U100K4.dat
+./heatmap -k 10 -d 4 -m MDA+ -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 4 -m MDA+ -h 5 -f ./data/inde/U1000K4.dat
+./heatmap -k 10 -d 4 -m MDA+ -h 5 -f ./data/inde/U5000K4.dat
+./heatmap -k 10 -d 4 -m MDA+ -h 5 -f ./data/inde/U10000K4.dat
+```
+
+Figure 9: Effect of d
+```
+./heatmap -k 10 -d 2 -m BL -h 5 -f ./data/inde/U500K2.dat
+./heatmap -k 10 -d 3 -m BL -h 5 -f ./data/inde/U500K3.dat
+./heatmap -k 10 -d 4 -m BL -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 5 -m BL -h 5 -f ./data/inde/U500K5.dat
+./heatmap -k 10 -d 6 -m BL -h 5 -f ./data/inde/U500K6.dat
+./heatmap -k 10 -d 7 -m BL -h 5 -f ./data/inde/U500K7.dat
+
+./heatmap -k 10 -d 2 -m CSA -h 5 -f ./data/inde/U500K2.dat
+./heatmap -k 10 -d 3 -m CSA -h 5 -f ./data/inde/U500K3.dat
+./heatmap -k 10 -d 4 -m CSA -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 5 -m CSA -h 5 -f ./data/inde/U500K5.dat
+./heatmap -k 10 -d 6 -m CSA -h 5 -f ./data/inde/U500K6.dat
+./heatmap -k 10 -d 7 -m CSA -h 5 -f ./data/inde/U500K7.dat
+
+./heatmap -k 10 -d 2 -m CSA+ -h 5 -f ./data/inde/U500K2.dat
+./heatmap -k 10 -d 3 -m CSA+ -h 5 -f ./data/inde/U500K3.dat
+./heatmap -k 10 -d 4 -m CSA+ -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 5 -m CSA+ -h 5 -f ./data/inde/U500K5.dat
+./heatmap -k 10 -d 6 -m CSA+ -h 5 -f ./data/inde/U500K6.dat
+./heatmap -k 10 -d 7 -m CSA+ -h 5 -f ./data/inde/U500K7.dat
+
+./heatmap -k 10 -d 2 -m MDA -h 5 -f ./data/inde/U500K2.dat
+./heatmap -k 10 -d 3 -m MDA -h 5 -f ./data/inde/U500K3.dat
+./heatmap -k 10 -d 4 -m MDA -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 5 -m MDA -h 5 -f ./data/inde/U500K5.dat
+./heatmap -k 10 -d 6 -m MDA -h 5 -f ./data/inde/U500K6.dat
+./heatmap -k 10 -d 7 -m MDA -h 5 -f ./data/inde/U500K7.dat
+
+./heatmap -k 10 -d 2 -m MDA+ -h 5 -f ./data/inde/U500K2.dat
+./heatmap -k 10 -d 3 -m MDA+ -h 5 -f ./data/inde/U500K3.dat
+./heatmap -k 10 -d 4 -m MDA+ -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 5 -m MDA+ -h 5 -f ./data/inde/U500K5.dat
+./heatmap -k 10 -d 6 -m MDA+ -h 5 -f ./data/inde/U500K6.dat
+./heatmap -k 10 -d 7 -m MAD+ -h 5 -f ./data/inde/U500K7.dat
+```
+
+Figure 10: Effect of k
+```
+./heatmap -k 1 -d 4 -m BL -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 5 -d 4 -m BL -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 4 -m BL -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 20 -d 4 -m BL -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 40 -d 4 -m BL -h 5 -f ./data/inde/U500K4.dat
+
+./heatmap -k 1 -d 4 -m CSA -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 5 -d 4 -m CSA -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 4 -m CSA -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 20 -d 4 -m CSA -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 40 -d 4 -m CSA -h 5 -f ./data/inde/U500K4.dat
+
+./heatmap -k 1 -d 4 -m CSA+ -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 5 -d 4 -m CSA+ -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 4 -m CSA+ -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 20 -d 4 -m CSA+ -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 40 -d 4 -m CSA+ -h 5 -f ./data/inde/U500K4.dat
+
+./heatmap -k 1 -d 4 -m MDA -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 5 -d 4 -m MDA -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 4 -m MDA -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 20 -d 4 -m MDA -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 40 -d 4 -m MDA -h 5 -f ./data/inde/U500K4.dat
+
+./heatmap -k 1 -d 4 -m MDA+ -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 5 -d 4 -m MDA+ -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 4 -m MDA+ -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 20 -d 4 -m MDA+ -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 40 -d 4 -m MDA+ -h 5 -f ./data/inde/U500K4.dat
+```
+
+Figure 11: Effect of \lambda
+```
+./heatmap -k 10 -d 4 -m BL -h 3 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 4 -m BL -h 4 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 4 -m BL -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 4 -m BL -h 6 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 4 -m BL -h 7 -f ./data/inde/U500K4.dat
+
+./heatmap -k 10 -d 4 -m CSA -h 3 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 4 -m CSA -h 4 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 4 -m CSA -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 4 -m CSA -h 6 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 4 -m CSA -h 7 -f ./data/inde/U500K4.dat
+
+./heatmap -k 10 -d 4 -m CSA+ -h 3 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 4 -m CSA+ -h 4 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 4 -m CSA+ -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 4 -m CSA+ -h 6 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 4 -m CSA+ -h 7 -f ./data/inde/U500K4.dat
+
+./heatmap -k 10 -d 4 -m MDA -h 3 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 4 -m MDA -h 4 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 4 -m MDA -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 4 -m MDA -h 6 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 4 -m MDA -h 7 -f ./data/inde/U500K4.dat
+
+./heatmap -k 10 -d 4 -m MDA+ -h 3 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 4 -m MDA+ -h 4 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 4 -m MDA+ -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 4 -m MDA+ -h 6 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 4 -m MDA+ -h 7 -f ./data/inde/U500K4.dat
+```
+
+Figure 12: Synthetic distributions and real product sets
+```
+./heatmap -k 10 -d 4 -m BL -h 5 -f ./data/cor/COR500K4.dat
+./heatmap -k 10 -d 4 -m BL -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 4 -m BL -h 5 -f ./data/anti/ANTI500K4.dat
+./heatmap -k 10 -d 4 -m BL -h 5 -f ./data/real/HOTEL4D.dat
+./heatmap -k 10 -d 6 -m BL -h 5 -f ./data/real/HOUSE6D.dat
+./heatmap -k 10 -d 8 -m BL -h 5 -f ./data/real/NBA8D.dat
+
+./heatmap -k 10 -d 4 -m CSA -h 5 -f ./data/cor/COR500K4.dat
+./heatmap -k 10 -d 4 -m CSA -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 4 -m CSA -h 5 -f ./data/anti/ANTI500K4.dat
+./heatmap -k 10 -d 4 -m CSA -h 5 -f ./data/real/HOTEL4D.dat
+./heatmap -k 10 -d 6 -m CSA -h 5 -f ./data/real/HOUSE6D.dat
+./heatmap -k 10 -d 8 -m CSA -h 5 -f ./data/real/NBA8D.dat
+
+./heatmap -k 10 -d 4 -m CSA+ -h 5 -f ./data/cor/COR500K4.dat
+./heatmap -k 10 -d 4 -m CSA+ -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 4 -m CSA+ -h 5 -f ./data/anti/ANTI500K4.dat
+./heatmap -k 10 -d 4 -m CAS+ -h 5 -f ./data/real/HOTEL4D.dat
+./heatmap -k 10 -d 6 -m CSA+ -h 5 -f ./data/real/HOUSE6D.dat
+./heatmap -k 10 -d 8 -m CSA+ -h 5 -f ./data/real/NBA8D.dat
+
+./heatmap -k 10 -d 4 -m MDA -h 5 -f ./data/cor/COR500K4.dat
+./heatmap -k 10 -d 4 -m MDA -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 4 -m MDA -h 5 -f ./data/anti/ANTI500K4.dat
+./heatmap -k 10 -d 4 -m MDA -h 5 -f ./data/real/HOTEL4D.dat
+./heatmap -k 10 -d 6 -m MDA -h 5 -f ./data/real/HOUSE6D.dat
+./heatmap -k 10 -d 8 -m MDA -h 5 -f ./data/real/NBA8D.dat
+
+./heatmap -k 10 -d 4 -m MDA+ -h 5 -f ./data/cor/COR500K4.dat
+./heatmap -k 10 -d 4 -m MDA+ -h 5 -f ./data/inde/U500K4.dat
+./heatmap -k 10 -d 4 -m MDA+ -h 5 -f ./data/anti/ANTI500K4.dat
+./heatmap -k 10 -d 4 -m MDA+ -h 5 -f ./data/real/HOTEL4D.dat
+./heatmap -k 10 -d 6 -m MDA+ -h 5 -f ./data/real/HOUSE6D.dat
+./heatmap -k 10 -d 8 -m MDA+ -h 5 -f ./data/real/NBA8D.dat
+```
