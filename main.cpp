@@ -28,7 +28,7 @@ int m2m(const char* s){
     int ret=1;
     if(strcmp(s, "BS") == 0){
         return mBASELINE;
-    }else if(strcmp(s, "UTK") == 0){
+    }else if(strcmp(s, "BL") == 0){
         return mUTK;
     }else if(strcmp(s, "CSA") == 0){
         return mCSA;
@@ -179,13 +179,13 @@ int main(const int argc, const char** argv) {
     string path=string(datafile);
     string df=path.substr(path.rfind('/'), path.size());
     df=df.substr(0, df.rfind('.'));
-    string filename=string("~/data/log/")+df+
+    string filename=string("./log/")+df+
             string("_k")+to_string(k)+
             string ("_h")+to_string(h)+
             string (methodName)+string (".log");
     s+=".log";
     log.open(filename, ios::out);
-    log << "Total time cost: " << elapsed_seconds.count() << endl;
+    log << "Total time cost: " << elapsed_seconds.count() << endl; // TODO add memory usage
     log << "rsky_c: " << rsky_c <<endl;
     log << "dmc_c: " << dmc_c <<endl;
     log << "rdo_g_c: " << rdo_g_c <<endl;
