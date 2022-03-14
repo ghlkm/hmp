@@ -60,6 +60,8 @@ public:
 
     vector<double> rskyband_lb_MDA; // each element: <id, lb>
 
+    cell()= default;
+
     cell(std::vector<double> &b, int cur_level, int tar_level, int card, int K, int m=mMDAp){
         /*
          * \para b, bounds

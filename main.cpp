@@ -146,15 +146,15 @@ int main(const int argc, const char** argv) {
         cout<<"MDA+ end"<<endl;
     }else if(method==mTOPK1){
         // usual rtree top-k
-        unordered_map<long int, RtreeNode *> empty_now; // not empty later
-        topk_multi(*root_ptr, k,  P, 100, nullptr, empty_now, false);
+//        unordered_map<long int, RtreeNode *> empty_now; // not empty later
+        topk_multi(*root_ptr, k,  P, 100, nullptr, false);
     }else if(method==mTOPK2){
         // usual rtree top-k and initialize bound as MaxMinK
         // 1. first find weight vector in which cell
         // 2. then find the cell's MaxMin_k
         // 3. find topk using MaxMin_k as a bound to prune
-        unordered_map<long int, RtreeNode *> empty_now; // not empty later
-        topk_multi(*root_ptr, k,  P, 100, nullptr, empty_now, true);
+//        unordered_map<long int, RtreeNode *> empty_now; // not empty later
+        topk_multi(*root_ptr, k,  P, 100, nullptr, true);
     }
     cout<<cell_debug<<endl;
     cout<<vt_debug<<endl;

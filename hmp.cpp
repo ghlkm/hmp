@@ -21,10 +21,14 @@ void Baseline2(cell &root, std::vector<std::vector<double>> &P){
     for(auto &child:root.children){
         s_rsky_p_c+=child->dim*2+child->vertexes.size()*child->dim;
         child->Baseline2_insert(P, rtree_rt, ramTree);
+        s_rsky_p_c-=child->dim*2+child->vertexes.size()*child->dim;
     }
 //    score_size+=ramTree.size()*1024;
 }
 
+long pop_cnt=0;
+long visit_cnt=0;
+long push_heap_cnt=0;
 vector<int> topk_single(int k,  std::vector<std::vector<double>> &P, vector<double>&w, double uHeat,
                  Rtree *rtree_rt, unordered_map<long int, RtreeNode *> &ramTree){
     RtreeNode* node;
@@ -36,10 +40,12 @@ vector<int> topk_single(int k,  std::vector<std::vector<double>> &P, vector<doub
     vector<int> topk;
     double tmp_score;
     double pageID;
-    while(!heap.empty() || topk.size()<k){
+
+    while(!heap.empty() && topk.size()<k){
         tmp_score=heap.top().first;
         pageID=heap.top().second;
         heap.pop();
+        pop_cnt+=1;
         if (pageID >= MAXPAGEID){ // an option
             topk.push_back(pageID-MAXPAGEID);
         }else{ // an inter node
@@ -53,6 +59,7 @@ vector<int> topk_single(int k,  std::vector<std::vector<double>> &P, vector<doub
                         heap.emplace(tmp_score, node->m_entry[i]->m_id + MAXPAGEID);
                     }
                 }
+                visit_cnt+=node->m_usedspace;
             }
             else{
                 for (int i = 0; i < node->m_usedspace; i++){
@@ -65,15 +72,18 @@ vector<int> topk_single(int k,  std::vector<std::vector<double>> &P, vector<doub
                         heap.emplace(tmp_score, node->m_entry[i]->m_id);
                     }
                 }
+                visit_cnt+=node->m_usedspace; // TODO visit cnt is useless
             }
         }
     }
+    push_heap_cnt+=heap.size();
     assert(topk.size()==k);
     return topk;
 }
 
 vector<vector<double>> gen_weight_vector(int k, int dim, int num){
-    vector<vector<double>> ws(num);
+    vector<vector<double>> ws;
+    ws.reserve(num);
     srand(0); // a fixed random seed makes stable results
 
     for (int i=0;i<num;i++){ // generate user preference uniformly under the constraint \sum v_i=1,
@@ -96,12 +106,11 @@ double getMaxMin_k(cell &root, int k, vector<double> &w, vector<vector<double>> 
     int dim=w.size();
     vector<double> cur_bounds(dim*2, 0);
     for (int i = 0; i < dim; ++i) {
-        cur_bounds[dim*2+1]=1.0;
+        cur_bounds[i*2+1]=1.0;
     }
-    cell c=root; // empty init
     int cur_level=0;
     vector<int> new_idx=vector<int>();
-    while(c.isLeaf()){ // time complexity d*h
+    while(true){ // time complexity d*h
         cur_level++;
         // get next level cell
         for (int i = 0; i <dim ; ++i) {  // update bound, time complexity d
@@ -112,7 +121,7 @@ double getMaxMin_k(cell &root, int k, vector<double> &w, vector<vector<double>> 
                 cur_bounds[i*2+1]=mid;
             }
         }
-        c=cell(cur_bounds, cur_level, root.tar_l, 0, k, mMDAp);
+        cell c=cell(cur_bounds, cur_level, root.tar_l, 0, k, mMDAp);
 
         vector<double> lbs, ubs;
         c.get_lu_scores(idx, P, lbs, ubs);
@@ -159,7 +168,8 @@ double getMaxMin_k(cell &root, int k, vector<double> &w, vector<vector<double>> 
 }
 
 void topk_multi(cell &root, int k,  std::vector<std::vector<double>> &P, int num,
-                Rtree *rtree_rt, unordered_map<long int, RtreeNode *> &ramTree, bool uHeat){
+                Rtree *rtree_rt,  bool uHeat){
+    unordered_map<long int, RtreeNode *> ramTree;
     if(rtree_rt== nullptr){
         build_rtree(rtree_rt, ramTree, P);
     }
@@ -169,6 +179,8 @@ void topk_multi(cell &root, int k,  std::vector<std::vector<double>> &P, int num
     }
     int dim=P[0].size();
     vector<vector<double>> query_ws=gen_weight_vector(k, dim, num);
+    assert(!query_ws.empty());
+    assert(!query_ws[0].empty());
     vector<double> MaxMin_k;
     if(uHeat) {
         for (auto &w: query_ws) { // get MaxMin_k
@@ -177,6 +189,7 @@ void topk_multi(cell &root, int k,  std::vector<std::vector<double>> &P, int num
     }else{
         MaxMin_k=vector<double>(num, 0.0);
     }
+    cout<<"get MaxMin_k finish"<<endl;
     auto ab = chrono::steady_clock::now();
 
     for(int i=0;i<num;i++){
@@ -186,6 +199,9 @@ void topk_multi(cell &root, int k,  std::vector<std::vector<double>> &P, int num
     auto ae = chrono::steady_clock::now();
     chrono::duration<double> elapsed_seconds= ae-ab;
     cout << "100 top-k query time cost: " << elapsed_seconds.count() << endl;
+    cout<<"pop_cnt:"<<pop_cnt<<endl;
+    cout<<"visit_cnt:"<<visit_cnt<<endl;
+    cout<<"push_heap_cnt:"<<push_heap_cnt+pop_cnt<<endl;
 }
 
 void CSA(cell &root, std::vector<std::vector<double>> &P){
