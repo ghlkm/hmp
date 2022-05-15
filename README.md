@@ -1,8 +1,8 @@
-# Spaital Heatmap
+# HMP
 
 This is a C++ project for summited paper:
 
-***Quantifying the Competitiveness of a Market in Relation to User Preferences*** 
+***Quantifying the Competitiveness of a Dataset in Relation to User Preferences*** 
 
 We supply using cmake to compile our project in a linux machine 
 (if you are using windows, you could download cygwin with gcc/g++ and cmake), 
@@ -59,7 +59,7 @@ After run command as listed above, you would generate a file called "heatmap" in
 Dataset
 ------
 the full option dataset link: <br />
-https://drive.google.com/drive/folders/1LKJNh6u4-d-uHpLciiKXU0COKo4qJUAW?usp=sharing
+https://drive.google.com/drive/folders/1lOCzducFXr9herFnH761Re4Oa3EmvNRv?usp=sharing
 
 Run our project:
 -----
@@ -265,4 +265,9 @@ Figure 12: Synthetic distributions and real product sets
 ./heatmap -k 10 -d 4 -m MDA+ -h 5 -f ./data/real/HOTEL4D.dat
 ./heatmap -k 10 -d 6 -m MDA+ -h 5 -f ./data/real/HOUSE6D.dat
 ./heatmap -k 10 -d 8 -m MDA+ -h 5 -f ./data/real/NBA8D.dat
+<<<<<<< HEAD
 ```
+=======
+```
+
+>>>>>>> c9308e87dccc42fdac92fd389ca92bfc4bb2321e
