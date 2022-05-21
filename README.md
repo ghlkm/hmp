@@ -59,7 +59,7 @@ After run command as listed above, you would generate a file called "heatmap" in
 Dataset
 ------
 the full option dataset link: <br />
-https://drive.google.com/drive/folders/1lOCzducFXr9herFnH761Re4Oa3EmvNRv?usp=sharing
+https://drive.google.com/drive/folders/1omw8ROtY5PzMd-Apdw0DIqnE2H0Hl9ZT?usp=sharing
 
 Run our project:
 -----
@@ -106,12 +106,6 @@ Figure 8: Effect of |P|
 ./heatmap -k 10 -d 4 -m CSA -h 5 -f ./data/inde/U5000K4.dat
 ./heatmap -k 10 -d 4 -m CSA -h 5 -f ./data/inde/U10000K4.dat
 
-./heatmap -k 10 -d 4 -m CSA+ -h 5 -f ./data/inde/U100K4.dat
-./heatmap -k 10 -d 4 -m CSA+ -h 5 -f ./data/inde/U500K4.dat
-./heatmap -k 10 -d 4 -m CSA+ -h 5 -f ./data/inde/U1000K4.dat
-./heatmap -k 10 -d 4 -m CSA+ -h 5 -f ./data/inde/U5000K4.dat
-./heatmap -k 10 -d 4 -m CSA+ -h 5 -f ./data/inde/U10000K4.dat
-
 ./heatmap -k 10 -d 4 -m MDA -h 5 -f ./data/inde/U100K4.dat
 ./heatmap -k 10 -d 4 -m MDA -h 5 -f ./data/inde/U500K4.dat
 ./heatmap -k 10 -d 4 -m MDA -h 5 -f ./data/inde/U1000K4.dat
@@ -141,12 +135,6 @@ Figure 9: Effect of d
 ./heatmap -k 10 -d 6 -m CSA -h 5 -f ./data/inde/U500K6.dat
 ./heatmap -k 10 -d 7 -m CSA -h 5 -f ./data/inde/U500K7.dat
 
-./heatmap -k 10 -d 2 -m CSA+ -h 5 -f ./data/inde/U500K2.dat
-./heatmap -k 10 -d 3 -m CSA+ -h 5 -f ./data/inde/U500K3.dat
-./heatmap -k 10 -d 4 -m CSA+ -h 5 -f ./data/inde/U500K4.dat
-./heatmap -k 10 -d 5 -m CSA+ -h 5 -f ./data/inde/U500K5.dat
-./heatmap -k 10 -d 6 -m CSA+ -h 5 -f ./data/inde/U500K6.dat
-./heatmap -k 10 -d 7 -m CSA+ -h 5 -f ./data/inde/U500K7.dat
 
 ./heatmap -k 10 -d 2 -m MDA -h 5 -f ./data/inde/U500K2.dat
 ./heatmap -k 10 -d 3 -m MDA -h 5 -f ./data/inde/U500K3.dat
@@ -177,12 +165,6 @@ Figure 10: Effect of k
 ./heatmap -k 20 -d 4 -m CSA -h 5 -f ./data/inde/U500K4.dat
 ./heatmap -k 40 -d 4 -m CSA -h 5 -f ./data/inde/U500K4.dat
 
-./heatmap -k 1 -d 4 -m CSA+ -h 5 -f ./data/inde/U500K4.dat
-./heatmap -k 5 -d 4 -m CSA+ -h 5 -f ./data/inde/U500K4.dat
-./heatmap -k 10 -d 4 -m CSA+ -h 5 -f ./data/inde/U500K4.dat
-./heatmap -k 20 -d 4 -m CSA+ -h 5 -f ./data/inde/U500K4.dat
-./heatmap -k 40 -d 4 -m CSA+ -h 5 -f ./data/inde/U500K4.dat
-
 ./heatmap -k 1 -d 4 -m MDA -h 5 -f ./data/inde/U500K4.dat
 ./heatmap -k 5 -d 4 -m MDA -h 5 -f ./data/inde/U500K4.dat
 ./heatmap -k 10 -d 4 -m MDA -h 5 -f ./data/inde/U500K4.dat
@@ -209,12 +191,6 @@ Figure 11: Effect of \lambda
 ./heatmap -k 10 -d 4 -m CSA -h 5 -f ./data/inde/U500K4.dat
 ./heatmap -k 10 -d 4 -m CSA -h 6 -f ./data/inde/U500K4.dat
 ./heatmap -k 10 -d 4 -m CSA -h 7 -f ./data/inde/U500K4.dat
-
-./heatmap -k 10 -d 4 -m CSA+ -h 3 -f ./data/inde/U500K4.dat
-./heatmap -k 10 -d 4 -m CSA+ -h 4 -f ./data/inde/U500K4.dat
-./heatmap -k 10 -d 4 -m CSA+ -h 5 -f ./data/inde/U500K4.dat
-./heatmap -k 10 -d 4 -m CSA+ -h 6 -f ./data/inde/U500K4.dat
-./heatmap -k 10 -d 4 -m CSA+ -h 7 -f ./data/inde/U500K4.dat
 
 ./heatmap -k 10 -d 4 -m MDA -h 3 -f ./data/inde/U500K4.dat
 ./heatmap -k 10 -d 4 -m MDA -h 4 -f ./data/inde/U500K4.dat
@@ -244,13 +220,6 @@ Figure 12: Synthetic distributions and real product sets
 ./heatmap -k 10 -d 4 -m CSA -h 5 -f ./data/real/HOTEL4D.dat
 ./heatmap -k 10 -d 6 -m CSA -h 5 -f ./data/real/HOUSE6D.dat
 ./heatmap -k 10 -d 8 -m CSA -h 5 -f ./data/real/NBA8D.dat
-
-./heatmap -k 10 -d 4 -m CSA+ -h 5 -f ./data/cor/COR500K4.dat
-./heatmap -k 10 -d 4 -m CSA+ -h 5 -f ./data/inde/U500K4.dat
-./heatmap -k 10 -d 4 -m CSA+ -h 5 -f ./data/anti/ANTI500K4.dat
-./heatmap -k 10 -d 4 -m CAS+ -h 5 -f ./data/real/HOTEL4D.dat
-./heatmap -k 10 -d 6 -m CSA+ -h 5 -f ./data/real/HOUSE6D.dat
-./heatmap -k 10 -d 8 -m CSA+ -h 5 -f ./data/real/NBA8D.dat
 
 ./heatmap -k 10 -d 4 -m MDA -h 5 -f ./data/cor/COR500K4.dat
 ./heatmap -k 10 -d 4 -m MDA -h 5 -f ./data/inde/U500K4.dat
