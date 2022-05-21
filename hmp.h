@@ -11,8 +11,6 @@ void Baseline2(cell &root, std::vector<std::vector<double>> &P);
 
 void CSA(cell &root, std::vector<std::vector<double>> &P);
 
-void CSAp(cell &root, std::vector<std::vector<double>> &P);
-
 void MDA(cell &root, std::vector<std::vector<double>> &P);
 
 void MDAp(cell &root, std::vector<std::vector<double>> &P);

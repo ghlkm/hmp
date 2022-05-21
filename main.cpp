@@ -30,10 +30,8 @@ int m2m(const char* s){
         return mBASELINE;
     }else if(strcmp(s, "BL") == 0){
         return mUTK;
-    }else if(strcmp(s, "CSA") == 0){
+    }else if(strcmp(s, "CSA") == 0) {
         return mCSA;
-    }else if(strcmp(s, "CSA+") == 0){
-        return mCSAp;
     }else if(strcmp(s, "MDA") == 0){
         return mMDA;
     }else if(strcmp(s, "MDA+") == 0){
@@ -132,10 +130,6 @@ int main(const int argc, const char** argv) {
         cout<<"CSA begin"<<endl;
         CSA(*root_ptr, P);
         cout<<"CSA end"<<endl;
-    }else if(method==mCSAp){
-        cout<<"CSA+ begin"<<endl;
-        CSAp(*root_ptr, P);
-        cout<<"CSA+ end"<<endl;
     }else if(method==mMDA){
         cout<<"MDA begin"<<endl;
         MDA(*root_ptr, P);

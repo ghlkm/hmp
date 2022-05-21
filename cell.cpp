@@ -12,9 +12,9 @@ void get_all_leaves(cell &node, std::vector<cell*>& ret){
     }
 }
 
-long rsky_c=0; // CSA, CSA+, leaf
-long dmc_c=0;  // CSA, CSA+, all
-long rdo_g_c=0; // CSA+, dominate number
+long rsky_c=0; // CSA,  , leaf
+long dmc_c=0;  // CSA,  , all
+long rdo_g_c=0; //  , dominate number
 long s_rsky_c=0; // MDA, all
 long s_rsky_p_c=0; // MDA+, max k
 long rtest_c=0; // r-dominate test count
