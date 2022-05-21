@@ -265,9 +265,4 @@ Figure 12: Synthetic distributions and real product sets
 ./heatmap -k 10 -d 4 -m MDA+ -h 5 -f ./data/real/HOTEL4D.dat
 ./heatmap -k 10 -d 6 -m MDA+ -h 5 -f ./data/real/HOUSE6D.dat
 ./heatmap -k 10 -d 8 -m MDA+ -h 5 -f ./data/real/NBA8D.dat
-<<<<<<< HEAD
-```
-=======
-```
 
->>>>>>> c9308e87dccc42fdac92fd389ca92bfc4bb2321e
