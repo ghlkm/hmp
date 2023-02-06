@@ -29,7 +29,7 @@ extern long rtest_c;
 extern vector<long> dmc_p_c;
 extern vector<long> dg_p_c;
 extern long score_size; // baseline
-
+extern int debug_vcnt;
 
 class cell{
 public:

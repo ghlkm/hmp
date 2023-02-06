@@ -199,6 +199,9 @@ void topk_multi(cell &root, int k,  std::vector<std::vector<double>> &P, int num
     auto ae = chrono::steady_clock::now();
     chrono::duration<double> elapsed_seconds= ae-ab;
     cout << "100 top-k query time cost: " << elapsed_seconds.count() << endl;
+    cout<<"avg pop_cnt:"<<(double)pop_cnt/num<<endl;
+    cout<<"avg visit_cnt:"<<(double)visit_cnt/num<<endl;
+    cout<<"avg push_heap_cnt:"<<(double)(push_heap_cnt+pop_cnt)/num<<endl;
     cout<<"pop_cnt:"<<pop_cnt<<endl;
     cout<<"visit_cnt:"<<visit_cnt<<endl;
     cout<<"push_heap_cnt:"<<push_heap_cnt+pop_cnt<<endl;

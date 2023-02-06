@@ -48,6 +48,15 @@ inline bool v1_dominate_v2(vector<double>& v1, vector<double>& v2){
 vector<vector<double>> read_options(const char* datafile, int dim){
     fstream fpdata;
     fpdata.open(datafile, ios::in);
+    if (fpdata.is_open())
+    {
+        std::cout << "Output operation successfully performed\n";
+    }
+    else
+    {
+        std::cout << "Error opening file";
+        exit(-1);
+    }
     int id;
     double tmp;
     vector<vector<double>> P0;
@@ -67,6 +76,7 @@ vector<vector<double>> read_options(const char* datafile, int dim){
         }
         P0.push_back(option);
         if(P0.size()%10000==0){
+            cout<<id<<","<<option<<endl;
             cout << P0.size() << " objects loaded" << endl;
         }
     }

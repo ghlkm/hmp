@@ -66,7 +66,7 @@ int main(const int argc, const char** argv) {
     vector<vector<double>> P0=read_options(datafile, dim);
 
     vector<int> kskyband;
-    vector<vector<int>> w;
+//    vector<vector<int>> w;
     string s=string(datafile);
     s+=".kskyband";
 //    kskyband_write(P0, k, s, w);
@@ -75,6 +75,9 @@ int main(const int argc, const char** argv) {
     vector<vector<int>> r;
     kskyband_read(s, r);
     for (int ik=0;ik<k;++ik) {
+        if(ik>=r.size()){
+            break;
+        }
         for (int &i:r[ik]) {
             kskyband.push_back(i);
         }
@@ -150,6 +153,7 @@ int main(const int argc, const char** argv) {
 //        unordered_map<long int, RtreeNode *> empty_now; // not empty later
         topk_multi(*root_ptr, k,  P, 100, nullptr, true);
     }
+    // TODO add later
     cout<<cell_debug<<endl;
     cout<<vt_debug<<endl;
 
@@ -172,13 +176,25 @@ int main(const int argc, const char** argv) {
     fstream log;
     string path=string(datafile);
     string df=path.substr(path.rfind('/'), path.size());
+    string folder=path.substr(0, path.rfind('/'));
     df=df.substr(0, df.rfind('.'));
-    string filename=string("./log/")+df+
+    string filename=folder+"/../"+string("/log/")+df+
             string("_k")+to_string(k)+
             string ("_h")+to_string(h)+
             string (methodName)+string (".log");
     s+=".log";
     log.open(filename, ios::out);
+    if (log.is_open())
+    {
+        cout<<filename<<endl;
+        std::cout << "Output operation successfully performed\n";
+    }
+    else
+    {
+        cout<<filename<<endl;
+        std::cout << "Error opening file";
+        exit(-1);
+    }
     log << "Total time cost: " << elapsed_seconds.count() << endl; // TODO add memory usage
     log << "rsky_c: " << rsky_c <<endl;
     log << "dmc_c: " << dmc_c <<endl;
