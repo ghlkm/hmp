@@ -22,7 +22,9 @@ extern vector<long> dmc_p_c;
 extern vector<long> dg_p_c;
 extern long rtest_c;
 extern long score_size; // baseline
-
+unordered_map<long int, RtreeNode*> ramTree; // load Rtree to main-memory
+Rtree* rtree;
+std::size_t page_access=0;
 
 int m2m(const char* s){
     int ret=1;
@@ -62,13 +64,71 @@ int main(const int argc, const char** argv) {
     const char* datafile = read(argc, argv, "-f", "");  // option file name
     int h = atoi(read(argc, argv, "-h", ""));
     int method=m2m(methodName);
+//    vector<vector<double>> P0=read_options(datafile, dim, rtreep);
 
-    vector<vector<double>> P0=read_options(datafile, dim);
+    bool rtreep=true; // default should be false
 
+    const char* indexfile = "./index.txt";
+    vector<RtreeNodeEntry*> p;
+    vector<vector<double>> P0;
+    fstream fpdata;
+    fpdata.open(datafile, ios::in);
+    int id;
+    vector<vector<float>> PointSet;
+    PointSet.emplace_back(dim*2);
+    P0.emplace_back(dim);
+    int objCnt=0;
+    while (!fpdata.eof()){
+        fpdata >> id;
+        if (fpdata.eof())
+            break;
+        P0.emplace_back(dim);
+        PointSet.emplace_back(2*dim);
+        for (int d = 0; d < dim; d++){
+            fpdata >> PointSet.back()[d];
+        }
+        for (int d = 0; d < dim; d++){
+            fpdata >> PointSet.back()[d+dim];
+        }
+        for (int d = 0; d < dim; d++){
+            P0.back()[d]=(PointSet.back()[d]+PointSet.back()[d+dim])/2.0;
+        }
+
+        Hypercube hc(dim, &PointSet[objCnt + 1][0], &PointSet[objCnt + 1][dim]);
+
+        p.push_back(new RtreeNodeEntry(id, hc));
+        objCnt++;
+        //log information
+        if (objCnt % 1000 == 0)
+            cout << ".";
+        if (objCnt % 10000 == 0)
+            cout << objCnt << " objects loaded" << endl;
+    }
+    fpdata.close();
+    cout << "Total number of options: " << objCnt << endl;
+    // build rtree
+    cout << "Bulkloading R-tree..." << endl;
+    const int maxChild = (PAGESIZE - RtreeNode::size()) / RtreeNodeEntry::size(dim);
+    FileMemory mem(PAGESIZE, indexfile, RtreeNodeEntry::fromMem, true);
+    cout << "[Rtree allocate mem done]" << endl;
+    rtree = TGS::bulkload(mem, dim, maxChild, maxChild, (int)maxChild*0.3, (int)maxChild*0.3, p.data(), objCnt, false);
+    cout << "[Rtree build done]" << endl;
+    // in-memory rtree
+    cout << "cache R-tree into memory" << endl;
+    rtreeRAM(*rtree, ramTree);
+    // aggregate rtree
+    aggregateRecords(*rtree);
+    cout << "[Aggregate Rtree done]" << endl;
+//    void kskyband_rtree(const int dimen, Rtree& a_rtree, vector<long int>& kskyband, float* PG[], const int k)
     vector<int> kskyband;
+    kskyband_rtree(dim, *rtree, kskyband, PointSet, k); //
+    cout<<"page_access: "<<page_access<<endl;
+    exit(1);
 //    vector<vector<int>> w;
     string s=string(datafile);
     s+=".kskyband";
+
+
 //    kskyband_write(P0, k, s, w);
 //    exit(0);
 

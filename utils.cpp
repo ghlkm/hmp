@@ -45,6 +45,18 @@ inline bool v1_dominate_v2(vector<double>& v1, vector<double>& v2){
     return true;
 }
 
+float minDist(float p1[], float p2[], int dimen)
+{
+    float mindist = 0;
+
+    for (int i = 0; i < dimen; i++)
+    {
+        float dist = p1[i] - p2[i];
+        mindist += (dist * dist);
+    }
+    return (float)sqrt(mindist);
+}
+
 vector<vector<double>> read_options(const char* datafile, int dim){
     fstream fpdata;
     fpdata.open(datafile, ios::in);
