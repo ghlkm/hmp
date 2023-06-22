@@ -32,8 +32,8 @@
 
 //#define DEBUG
 
-#define MAXPAGEID 49999999
-#define MAXPTS 50000001  // macro define the maximum number of points
+#define MAXPAGEID 499999999
+#define MAXPTS 500000001  // macro define the maximum number of points
 #define MB 1048576      // macro define the size of MB
 
 #ifdef DEBUG
@@ -44,7 +44,7 @@
 
 
 
-#define SIDELEN 0.001  // make sure this SIDELEN is correct for each running of different data
+#define SIDELEN 0.0001  // make sure this SIDELEN is correct for each running of different data
 #define CELLING 1.000
 
 #endif

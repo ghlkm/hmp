@@ -1,6 +1,8 @@
 
 #include "cell.h"
-
+#ifdef DEBUG
+vector<vector<double>> wheat;
+#endif
 
 void get_all_leaves(cell &node, std::vector<cell*>& ret){
     if(node.children.empty()){

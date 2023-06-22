@@ -115,7 +115,8 @@ void kskyband_rtree(const int dimen, Rtree& a_rtree, vector<int>& kskyband, VV& 
 
     float pt[MAXDIMEN];
     float ORIGNIN[MAXDIMEN];
-    double sidelen=(PG[1][dimen-1]-PG[1][0])/2.0;
+    double sidelen=(PG[1][dimen]-PG[1][0])/2.0;
+//    double sidelen=0.000001;
     float mindist;
     for (int i = 0; i < dimen; i++)
         ORIGNIN[i] = 1;
@@ -124,58 +125,55 @@ void kskyband_rtree(const int dimen, Rtree& a_rtree, vector<int>& kskyband, VV& 
     float dist_tmp;
 
     heap.emplace(INFINITY, a_rtree.m_memory.m_rootPageID);
-
-    while (!heap.empty())
-    {
+    int prune_cnt=0;
+    int first_node_cnt=0;
+    int first_node_prune=0;
+    while (!heap.empty()){
         heapIter = heap.begin();
         dist_tmp = heapIter->first;
         pageID = heapIter->second;
         heap.erase(heapIter);
-
-        if (pageID > MAXPAGEID)
-        {
+        if (pageID > MAXPAGEID){
             for (int d = 0; d < dimen; d++)
                 pt[d] = (PG[pageID - MAXPAGEID][d] + PG[pageID - MAXPAGEID][d + dimen])/2;
-            if (!dominatedByK(dimen, pt, kskyband, PG, k))
-            {
+            if (!dominatedByK(dimen, pt, kskyband, PG, k)){
                 kskyband.push_back(pageID - MAXPAGEID);
             }
-        }
-        else
-        {
+        }else{
             //node = a_rtree.m_memory.loadPage(pageID);
             node = ramTree[pageID];
             page_access++;
-            if (node->isLeaf())
-            {
-                for (int i = 0; i < node->m_usedspace; i++)
-                {
-                    for (int d = 0; d < dimen; d++)
-                    {
+            if (node->isLeaf()){
+                for (int i = 0; i < node->m_usedspace; i++){
+                    for (int d = 0; d < dimen; d++){
                         pt[d] = node->m_entry[i]->m_hc.getLower()[d] + sidelen;
                     }
-                    if (!dominatedByK(dimen, pt, kskyband, PG, k))
-                    {
+                    if (!dominatedByK(dimen, pt, kskyband, PG, k)){
                         mindist = minDist(pt, ORIGNIN, dimen);
                         heap.emplace(mindist, node->m_entry[i]->m_id + MAXPAGEID);
                     }
                 }
-            }
-            else
-            {
-                for (int i = 0; i < node->m_usedspace; i++)
-                {
+            }else{
+                for (int i = 0; i < node->m_usedspace; i++){
                     for (int d = 0; d < dimen; d++)
                         pt[d] = node->m_entry[i]->m_hc.getUpper()[d];
-                    if (!dominatedByK(dimen, pt, kskyband, PG, k))
-                    {
+                    if (!dominatedByK(dimen, pt, kskyband, PG, k)){
                         mindist = minDist(pt, ORIGNIN, dimen);
                         heap.emplace(mindist, node->m_entry[i]->m_id);
+                    }else{
+                        prune_cnt++;
+                        if(pageID==a_rtree.m_memory.m_rootPageID){
+                            first_node_prune++;
+                        }
                     }
+                    if(pageID==a_rtree.m_memory.m_rootPageID)
+                        first_node_cnt++;
                 }
             }
         }
     }
+    cout<<"prune cnt: "<< prune_cnt<<endl;
+    cout<<first_node_cnt<<", "<<first_node_prune<<endl;
 }
 
 

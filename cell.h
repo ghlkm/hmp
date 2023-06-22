@@ -18,7 +18,10 @@
 #define mMDAp 4
 #define mTOPK1 5
 #define mTOPK2 6
-
+#define DEBUG
+#ifdef DEBUG
+extern vector<vector<double>> wheat;
+#endif
 extern vector<int> cell_debug;
 
 extern vector<int> vt_debug;
@@ -40,7 +43,9 @@ public:
     std::vector<double> bounds;
     std::vector<std::vector<double>> vertexes;
     std::vector<int> dmc; // only used for CSA, "dominated" count array, dmc[i]=j means option i dominated by totally j options
-    double uHeat; // the k_th largest minimum score
+    double uHeat; // MaxMin_k, the k_th largest minimum score
+    double MaxKMaxUHeat;
+    double AvgMaxUHeat;
     double rHeat; // No. of RSK
     double dHeat; // No. of r-dominate relationships
     int cur_l; // current level
@@ -72,6 +77,8 @@ public:
         dim=b.size()/2;
         bounds=b;
         uHeat=0.0;
+        MaxKMaxUHeat=0.0;
+        AvgMaxUHeat=0.0;
         rHeat=0.0;
         dHeat=0.0;
         cur_l=cur_level;
@@ -314,7 +321,15 @@ public:
             }
             scores.push_back(s);
         }
-
+#ifdef DEBUG
+        for (int i = 0; i < k; ++i) {
+            for (int j = i+1; j < k; ++j) {
+                if(r_dominate(scores[i], scores[j])){
+                    dHeat+=1;
+                }
+            }
+        }
+#endif
         for (int i = k; i <tmp.size() ; ++i) {
             int r_dominate_count=0;
             vector<double> s;
@@ -439,12 +454,44 @@ public:
         }else{
             this->MDA_superSet2RKS(P);
             rsky_c+=this->rkskyband.size();
+            uHeat=theta;
+            rHeat=rkskyband.size();
+#ifdef DEBUG
+            cal_mm_am_uHeats(P);
+            vector<double> heats={uHeat, MaxKMaxUHeat, AvgMaxUHeat, rHeat, dHeat};
+            wheat.emplace_back(heats);
+#endif
         }
         if(cnt>s_rsky_p_c){
             s_rsky_p_c=cnt;
         }
     }
 
+    void cal_mm_am_uHeats(vector<vector<double>> &data){
+        vector<double> mina;
+        vector<double> maxa;
+        mina.reserve(rkskyband.size());
+        maxa.reserve(rkskyband.size());
+        for (auto i:rkskyband) {
+            double maxv=0;
+            double minv=1e9;
+            for(auto &v: vertexes){
+                double tmp_score=v*data[i];
+                if(maxv<tmp_score){
+                    maxv=tmp_score;
+                }
+                if(minv>tmp_score){
+                    minv=tmp_score;
+                }
+            }
+            mina.push_back(minv);
+            maxa.push_back(maxv);
+        }
+        sort(maxa.begin(), maxa.end(), greater<>());
+        sort(mina.begin(), mina.end(), greater<>());
+        MaxKMaxUHeat=maxa[k-1];
+        AvgMaxUHeat=sum(maxa)/maxa.size();
+    }
 
     void Baseline_insert(vector<vector<double>> &P){
         if(isLeaf()){

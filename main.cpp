@@ -8,7 +8,7 @@
 #include <fstream>
 
 using namespace std;
-
+#define RTREE_IO
 vector<int> cell_debug;
 
 vector<int> vt_debug;
@@ -64,13 +64,16 @@ int main(const int argc, const char** argv) {
     const char* datafile = read(argc, argv, "-f", "");  // option file name
     int h = atoi(read(argc, argv, "-h", ""));
     int method=m2m(methodName);
-//    vector<vector<double>> P0=read_options(datafile, dim, rtreep);
-
-    bool rtreep=true; // default should be false
-
-    const char* indexfile = "./index.txt";
     vector<RtreeNodeEntry*> p;
+    vector<int> kskyband;
+#ifndef RTREE_IO
+    vector<vector<double>> P0=read_options(datafile, dim);
+#endif
+#ifdef RTREE_IO
     vector<vector<double>> P0;
+//    string indexf=string("./")+string(datafile)+string("index.txt");
+//    const char* indexfile = indexf.c_str();
+    const char* indexfile="index4.txt";
     fstream fpdata;
     fpdata.open(datafile, ios::in);
     int id;
@@ -120,10 +123,15 @@ int main(const int argc, const char** argv) {
     aggregateRecords(*rtree);
     cout << "[Aggregate Rtree done]" << endl;
 //    void kskyband_rtree(const int dimen, Rtree& a_rtree, vector<long int>& kskyband, float* PG[], const int k)
-    vector<int> kskyband;
-    kskyband_rtree(dim, *rtree, kskyband, PointSet, k); //
-    cout<<"page_access: "<<page_access<<endl;
-    exit(1);
+//    auto kskyb = chrono::steady_clock::now();
+//    kskyband_rtree(dim, *rtree, kskyband, PointSet, k); //
+//    auto kskye = chrono::steady_clock::now();
+//    chrono::duration<double> kskyt= kskye-kskyb;
+//    cout << "kskyband time cost: " << kskyt.count() << endl;
+//    cout<<"kskyband"<<kskyband.size()<<endl;
+//    cout<<"page_access: "<<page_access<<endl;
+//    exit(1);
+#endif
 //    vector<vector<int>> w;
     string s=string(datafile);
     s+=".kskyband";
@@ -139,7 +147,9 @@ int main(const int argc, const char** argv) {
             break;
         }
         for (int &i:r[ik]) {
-            kskyband.push_back(i);
+            kskyband.push_back(i+1);
+//            cout<<i<<": "<<P0[i]<<endl;
+//            exit(0);
         }
     }
 //    kskyband=vector<int>(kskyband.rbegin(), kskyband.rend());
@@ -213,7 +223,6 @@ int main(const int argc, const char** argv) {
 //        unordered_map<long int, RtreeNode *> empty_now; // not empty later
         topk_multi(*root_ptr, k,  P, 100, nullptr, true);
     }
-    // TODO add later
     cout<<cell_debug<<endl;
     cout<<vt_debug<<endl;
 
@@ -233,7 +242,8 @@ int main(const int argc, const char** argv) {
     cout << dg_p_c << endl;
     cout << rtest_c << endl;
 
-    fstream log;
+#ifdef DEBUG
+    fstream hlog;
     string path=string(datafile);
     string df=path.substr(path.rfind('/'), path.size());
     string folder=path.substr(0, path.rfind('/'));
@@ -241,30 +251,58 @@ int main(const int argc, const char** argv) {
     string filename=folder+"/../"+string("/log/")+df+
             string("_k")+to_string(k)+
             string ("_h")+to_string(h)+
-            string (methodName)+string (".log");
+            string (methodName)+string (".heat");
     s+=".log";
-    log.open(filename, ios::out);
-    if (log.is_open())
-    {
+    hlog.open(filename, ios::out);
+    if (hlog.is_open()){
         cout<<filename<<endl;
         std::cout << "Output operation successfully performed\n";
-    }
-    else
-    {
+    }else{
         cout<<filename<<endl;
         std::cout << "Error opening file";
         exit(-1);
     }
-    log << "Total time cost: " << elapsed_seconds.count() << endl; // TODO add memory usage
-    log << "rsky_c: " << rsky_c <<endl;
-    log << "dmc_c: " << dmc_c <<endl;
-    log << "rdo_g_c: " << rdo_g_c <<endl;
-    log << "s_rsky_c: " << s_rsky_c <<endl;
-    log << "s_rsky_p_c: " << s_rsky_p_c<<endl;
-    log << "score_size: " << score_size <<endl;
-    log << dmc_p_c << endl;
-    log << dg_p_c << endl;
-    log << rtest_c << endl;
-    log.close();
+    for (auto &i: wheat) {
+        for (double j:i) {
+            hlog<<j<<" ";
+        }
+        hlog<<"\n";
+    }
+    hlog.close();
+    cout<<"wheat: "<<wheat.size()<<endl;
+#endif
+//    fstream log;
+//    string path=string(datafile);
+//    string df=path.substr(path.rfind('/'), path.size());
+//    string folder=path.substr(0, path.rfind('/'));
+//    df=df.substr(0, df.rfind('.'));
+//    string filename=folder+"/../"+string("/log/")+df+
+//            string("_k")+to_string(k)+
+//            string ("_h")+to_string(h)+
+//            string (methodName)+string (".log");
+//    s+=".log";
+//    log.open(filename, ios::out);
+//    if (log.is_open())
+//    {
+//        cout<<filename<<endl;
+//        std::cout << "Output operation successfully performed\n";
+//    }
+//    else
+//    {
+//        cout<<filename<<endl;
+//        std::cout << "Error opening file";
+//        exit(-1);
+//    }
+//    log << "Total time cost: " << elapsed_seconds.count() << endl; // TODO add memory usage
+//    log << "rsky_c: " << rsky_c <<endl;
+//    log << "dmc_c: " << dmc_c <<endl;
+//    log << "rdo_g_c: " << rdo_g_c <<endl;
+//    log << "s_rsky_c: " << s_rsky_c <<endl;
+//    log << "s_rsky_p_c: " << s_rsky_p_c<<endl;
+//    log << "score_size: " << score_size <<endl;
+//    log << dmc_p_c << endl;
+//    log << dg_p_c << endl;
+//    log << rtest_c << endl;
+//    log.close();
     return 0;
 }

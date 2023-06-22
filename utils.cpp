@@ -164,6 +164,14 @@ void kskyband_write(vector<vector<double>> &data, int k, string &filename, vecto
         cout<<"@k="<<l+1<<":num="<<k_cnt[l]<<endl;
     }
 
+//    for (int i = 1; i <= k; ++i) {
+//        cout<<"#"<<i<<":";
+//        for (int id: ret[i-1]) {
+//            cout<<id<<" ";
+//        }
+//        cout<<endl;
+//    }
+
     fstream log;
     log.open(filename, ios::out);
 
@@ -244,6 +252,7 @@ double sum(vector<double> &v){
 
 void rtreeRAM(const Rtree& rt, unordered_map<long int, RtreeNode*>& ramTree)
 {
+    int totalpages = 0;
     ramTree.clear();
     queue<long int> H;
     RtreeNode* node;
@@ -254,6 +263,7 @@ void rtreeRAM(const Rtree& rt, unordered_map<long int, RtreeNode*>& ramTree)
         pageID = H.front();
         H.pop();
         node = rt.m_memory.loadPage(pageID);
+        totalpages++;
         ramTree[pageID] = node;
         if (node->isLeaf() == false)
         {
@@ -263,6 +273,7 @@ void rtreeRAM(const Rtree& rt, unordered_map<long int, RtreeNode*>& ramTree)
             }
         }
     }
+    cout<<"the total number of pages in that tree is: "<<totalpages<<endl;
 }
 
 int countRecords(Rtree& a_rtree, int pageID)
